@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore ZS-specific files
+zscaler
+
+# Ignore vim scratch files
+.*.un~
+
+
 # C extensions
 *.so
 
