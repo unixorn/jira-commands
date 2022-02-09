@@ -51,6 +51,24 @@ def parseTicketCommentCLI():
     return cli
 
 
+def parseTicketCloseCLI():
+    """
+    Command line options for closing a ticket
+    """
+    parser = parseTicketCLI(description="Close a JIRA ticket")
+    parser.add_argument(
+        "--comment",
+        type=str,
+        help="Comment to add to the specified ticket, It only supports very limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+    )
+    cli = parser.parse_args()
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+    return cli
+
+
 def parseTicketInspectionCLI():
     """
     Command line options for ticket inspectors
@@ -150,6 +168,19 @@ def commentOnTicket():
 
     jira = JiraTool(settings=settings)
     jira.addComment(ticket=cli.ticket, comment=cli.comment)
+
+
+def closeTicket():
+    """
+    Close a ticket
+    """
+    cli = parseTicketCommentCLI()
+    logging.debug(f"cli: {cli}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    jira.transitionTicket(ticket=cli.ticket, state="Done", comment=cli.comment)
 
 
 def createTicket():
