@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+# Shim script to run jc inside a container
+#
+# Author: Joe Block <jblock@zscaler.com>
+# Copyright 2022, ZScaler
+# License: Apache 2.0
+# shellcheck disable=SC2003
+
+function debug() {
+  if [[ -n "$DEBUG" ]]; then
+    echo "$@"
+  fi
+}
+
+function fail() {
+  printf '%s\n' "$1" >&2  ## Send message to stderr. Exclude >&2 if you don't want it that way.
+  exit "${2-1}"  ## Return a code specified by $2 or 1 by default.
+}
+
+function has() {
+  # Check if a command is in $PATH
+  which "$@" > /dev/null 2>&1
+}
+
+load-lastupdate-age-from-file() {
+  local interval
+  local last_update
+  local now
+  now=$(date +%s)
+  if [[ -r "${1}" ]]; then
+    last_update=$(cat "${1}")
+  else
+    # no cookie file, default to dawn of time
+    last_update=0
+  fi
+  # shellcheck disable=SC2086
+  interval="$(expr ${now} - ${last_update})"
+  echo "${interval}"
+}
+
+check-for-image-update() {
+  local day_seconds
+  local refresh_seconds
+  local last_image_pull
+  mkdir -p "$SETTINGS_D"
+  day_seconds=$(expr 24 \* 60 \* 60)
+  refresh_seconds=$(expr "${day_seconds}" \* "${PULL_INTERVAL_IN_DAYS}")
+  last_image_pull=$(load-lastupdate-age-from-file "$PULL_COOKIE_F")
+
+  if [ "${last_image_pull}" -gt "${refresh_seconds}" ]; then
+    echo "Checking for container image updates..."
+    if "$CONTAINER_TOOL" pull "$JIRA_COMMAND_IMAGE"; then
+      debug "Writing timestamp to $PULL_COOKIE_F"
+      date +%s >! "$PULL_COOKIE_F"
+    else
+      echo "Could not pull $JIRA_COMMAND_IMAGE with $CONTAINER_TOOL"
+    fi
+  fi
+}
+
+set -o pipefail
+if [[ "$DEBUG" -gt 0 ]]; then
+  set -x
+fi
+
+SETTINGS_D="$HOME/.jira-commands"
+PULL_COOKIE_F="$SETTINGS_D/last-image-pull"
+PULL_INTERVAL_IN_DAYS="${PULL_INTERVAL_IN_DAYS:-14}"
+CONTAINER_TOOL='NONE'
+JIRA_COMMAND_IMAGE='unixorn/jira-commands'
+
+debug "SETTINGS_D: $SETTINGS_D"
+debug "PULL_INTERVAL_IN_DAYS: $PULL_INTERVAL_IN_DAYS"
+
+# List in descending preference order so we use `nerdctl` instead of `docker`
+# when both are present - we prefer to use `nerdctl` because on my 
+# M1 MacBook Pro, it runs 30% faster than `docker` does.
+for tool in docker nerdctl
+do
+  if has $tool; then
+    debug "Setting CONTAINER_TOOL to $tool"
+    CONTAINER_TOOL="$tool"
+  fi
+done
+
+if [[ -r "$SETTINGS_D/container-tool" ]]; then
+  # Force a specific container engine
+  CONTAINER_TOOL=$(cat "$HOME/.jira-commands/container-tool")
+  echo "FORCING $CONTAINER_TOOL"
+fi
+
+if [[ $CONTAINER_TOOL == 'NONE' ]]; then
+  fail "Can't find a tool to run jc jira commands in a container"
+fi
+check-for-image-update
+exec "$CONTAINER_TOOL" run -v "$HOME"/.jira-commands:/config --rm -it "$JIRA_COMMAND_IMAGE" jc "$@"
