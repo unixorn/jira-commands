@@ -141,7 +141,11 @@ class JiraTool:
         """
         Comment on a ticket
         """
-        return self.connection.add_comment(ticket, comment)
+        if comment:
+            logging.debug(f"Adding comment {comment} to ticket {ticket}")
+            return self.connection.add_comment(ticket, comment)
+        else:
+            raise RuntimeError("You must specify a comment to add to the ticket")
 
     def createTicket(self, issue_data: dict, strict=True):
         """
@@ -232,7 +236,7 @@ class JiraTool:
             logging.info(" ")
         return tickets
 
-    def transitionTicket(self, ticket: str, state: str):
+    def transitionTicket(self, ticket: str, state: str, comment: str = None):
         """
         Transition a ticket to a new state
         """
@@ -241,6 +245,8 @@ class JiraTool:
 
         if state in available_transitions:
             logging.info(f"Transitioning issue {ticket} to state {state}")
+            if comment:
+                self.addComment(ticket=ticket, comment=comment)
             return self.connection.transition_issue(issue, available_transitions[state])
         else:
             raise ValueError(
