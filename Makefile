@@ -37,7 +37,7 @@ local: wheel
 	docker buildx build --load -t unixorn/jira-commands .
 
 fatimage: wheel
-	docker buildx build --platform linux/arm64,linux/amd64 -t unixorn/jira-commands .
+	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands .
 	make local
 
 clean:

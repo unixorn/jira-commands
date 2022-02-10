@@ -52,7 +52,7 @@ check-for-image-update() {
     echo "Checking for container image updates..."
     if "$CONTAINER_TOOL" pull "$JIRA_COMMAND_IMAGE"; then
       debug "Writing timestamp to $PULL_COOKIE_F"
-      date +%s >! "$PULL_COOKIE_F"
+      date '+%s' > "$PULL_COOKIE_F"
     else
       echo "Could not pull $JIRA_COMMAND_IMAGE with $CONTAINER_TOOL"
     fi
