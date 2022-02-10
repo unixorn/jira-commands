@@ -3,6 +3,8 @@ name = "jira-commands"
 version = "0.2.1"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jblock@zscaler.com>"]
+homepage = "https://github.com/unixorn/jira-commands"
+repository = "https://github.com/unixorn/jira-commands"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -29,6 +31,9 @@ jc-ticket-print = 'jira_commands.cli.print:printTicket'
 jc-ticket-transition-list = 'jira_commands.cli.crudops:getTransitions'
 jc-ticket-transition-set = 'jira_commands.cli.crudops:transitionTo'
 jc-ticket-vivisect = 'jira_commands.cli.vivisect:vivisect'
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
