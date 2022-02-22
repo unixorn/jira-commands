@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.2.1"
+version = "0.3.0"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jblock@zscaler.com>"]
 homepage = "https://github.com/unixorn/jira-commands"
@@ -21,12 +21,14 @@ flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 jc = 'jira_commands.cli.jc:jc_driver'
+jc-link-tickets = 'jira_commands.cli.crudops:linkTickets'
 jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
 jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'
 jc-ticket-comment = 'jira_commands.cli.crudops:commentOnTicket'
 jc-ticket-comment-on-ticket = 'jira_commands.cli.crudops:commentOnTicket'
 jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
 jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'
+jc-ticket-link = 'jira_commands.cli.crudops:linkTickets'
 jc-ticket-print = 'jira_commands.cli.print:printTicket'
 jc-ticket-transition-list = 'jira_commands.cli.crudops:getTransitions'
 jc-ticket-transition-set = 'jira_commands.cli.crudops:transitionTo'

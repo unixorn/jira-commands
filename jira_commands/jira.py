@@ -9,6 +9,8 @@
 import getpass
 import json
 import logging
+import requests
+from requests.auth import HTTPBasicAuth
 
 from jira import JIRA
 from jira_commands.utils import dumpObject
@@ -66,12 +68,15 @@ def makeIssueData(cli):
 
     returns dict
     """
-    if cli.json:
-        issue_data = json.loads(cli.json)
-        logging.debug(f"issue_data (from --json): {issue_data}")
-    else:
-        logging.debug("Starting with blank issue data")
-        issue_data = {}
+    try:
+        if cli.json:
+            issue_data = json.loads(cli.json)
+            logging.debug(f"issue_data (from --json): {issue_data}")
+        else:
+            logging.debug("Starting with blank issue data")
+            issue_data = {}
+    except AttributeError:
+        logging.warning("No json command line argument found")
 
     if cli.description:
         logging.debug(f"description: {cli.description}")
@@ -94,6 +99,67 @@ def makeIssueData(cli):
         issue_data["summary"] = cli.summary
 
     return issue_data
+
+
+def linkIssuesHack(
+    source: str,
+    target: str,
+    link_type: str,
+    username: str,
+    password: str,
+    jira_server: str,
+):
+    """
+    Link two issues
+
+    This is a horrible hack because the jira module fails with a permission
+    error when I use its create_issue_link method, but I can use the same
+    username and password with curl against the JIRA API directly and that
+    works, so created an issue upstream and I'm using this requests.get hack
+    until https://github.com/pycontribs/jira/issues/1296 is fixed upstream.
+
+    Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
+    """
+
+    # This is documented to work, but returns an error that we don't have
+    # link issue permission.
+
+    # logging.info(f"Creating '{link_type}' link from {source} to {target}")
+    # result = self.connection.create_issue_link(
+    #     type=link_type, inwardIssue=source, outwardIssue=target
+    # )
+
+    data = {
+        "update": {
+            "issuelinks": [
+                {
+                    "add": {
+                        "type": {
+                            "name": link_type,
+                        },
+                        "outwardIssue": {"key": target},
+                    }
+                }
+            ]
+        }
+    }
+    url = f"{jira_server}/rest/api/2/issue/{source}"
+
+    logging.debug(f"username: {username}")
+    logging.debug(f"url: {url}")
+    logging.debug(f"data: {data}")
+
+    results = requests.put(url, auth=HTTPBasicAuth(username, password), json=data)
+    logging.debug(f"status code: {results.status_code}")
+    if results.status_code >= 200 and results.status_code < 300:
+        logging.debug("Successful")
+        logging.debug(f"results: {results}")
+        status = True
+    else:
+        logging.error(f"Call failed: {results.status_code}")
+        logging.error(f"results: {results}")
+        status = False
+    return status
 
 
 class JiraTool:
@@ -189,6 +255,27 @@ class JiraTool:
         issue_data["parent"] = {"id": parent}
         return self.createTicket(issue_data=issue_data)
 
+    def linkIssues(self, source, target, link_type):
+        """
+        Link two issues
+        """
+        # Jira is inconsistent about when you can use string ticket ids and
+        # when you have to use issue objects
+        source_issue = self.connection.issue(source)
+        target_issue = self.connection.issue(target)
+        logging.debug(f"source_issue: {source_issue}")
+        logging.debug(f"target_issue: {target_issue}")
+
+        # Link the two issues
+        return linkIssuesHack(
+            username=self.username,
+            password=self.password,
+            link_type=link_type,
+            source=source,
+            target=target,
+            jira_server=self.jira_server,
+        )
+
     def printTickets(self, project: str):
         for singleIssue in self.connection.search_issues(
             jql_str=f"project = {project}"
@@ -216,6 +303,8 @@ class JiraTool:
             print(f"  {transition}")
         print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
         print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
+        print(f"ticket.fields.issuelinks repr: {ticket.fields.issuelinks.repr()}")
+        print(f"ticket.fields.issuelinks dump: {dumpObject(ticket.fields.issuelinks)}")
         print(f"ticket.fields: {ticket.fields}")
         print()
         print(f"ticket.fields (dump): {dumpObject(ticket.fields)}")
