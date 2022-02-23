@@ -30,9 +30,6 @@ verbose_test:
 wheel: clean format
 	poetry build
 
-venv:
-	virtualenv venv
-
 local: wheel
 	docker buildx build --load -t unixorn/jira-commands .
 
