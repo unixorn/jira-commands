@@ -21,6 +21,7 @@ flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 jc = 'jira_commands.cli.jc:jc_driver'
+jc-get-link-types = 'jira_commands.cli.crudops:getLinkTypes'
 jc-link-tickets = 'jira_commands.cli.crudops:linkTickets'
 jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
 jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'

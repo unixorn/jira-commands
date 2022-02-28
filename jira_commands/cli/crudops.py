@@ -236,6 +236,33 @@ def createTicket():
     return results
 
 
+def getLinkTypes():
+    """
+    Get all the link types on a server
+    """
+    parser = baseCLIParser()
+    parser.add_argument("--json", help="Output in JSON format", action="store_true")
+    cli = parser.parse_args()
+
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+
+    link_type_names = []
+    for link_type in jira.connection.issue_link_types():
+        logging.debug(link_type.name)
+        link_type_names.append(link_type.name)
+    if cli.json:
+        print(json.dumps({"link_types": link_type_names}, indent=2))
+    else:
+        print(f"Link type names: {link_type_names}")
+
+
 def linkTickets():
     """
     Link two tickets
