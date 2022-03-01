@@ -46,8 +46,8 @@ def loadJiraSettings(path: str, cli):
     if not settings["password"]:
         raise RuntimeError("You must specify the jira server password")
 
-    logging.info(f"Using JIRA server: {settings['jira_server']}")
-    logging.info(f"username: {settings['username']}")
+    logging.debug(f"Using JIRA server: {settings['jira_server']}")
+    logging.debug(f"username: {settings['username']}")
 
     credentials = {"username": settings["username"], "password": settings["password"]}
     if "credentials" not in settings:
@@ -183,7 +183,7 @@ class JiraTool:
     def connect(self):
         jiraOptions = {"server": self.jira_server}
         jiraBasicAuth = (self.username, self.password)
-        logging.info(
+        logging.debug(
             f"Creating connection to {self.jira_server} with user {self.username}"
         )
         self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
@@ -318,11 +318,10 @@ class JiraTool:
             jql_str=f"project = {project}"
         ):
             tickets[singleIssue.key] = singleIssue
-            logging.info(f"{singleIssue.key} : {singleIssue}")
-            logging.info(f"{singleIssue.key} : fields {singleIssue.fields}")
-            # logging.debug(f'dir(singleIssue : {dir(singleIssue)}')
+            logging.debug(f"{singleIssue.key} : {singleIssue}")
+            logging.debug(f"{singleIssue.key} : fields {singleIssue.fields}")
             logging.debug(f"dumpObj(singleIssue : {dumpObject(singleIssue)}")
-            logging.info(" ")
+            logging.debug(" ")
         return tickets
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):

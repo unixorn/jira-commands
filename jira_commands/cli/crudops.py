@@ -119,7 +119,7 @@ def parseGetTransitionsCLI():
     loglevel = getattr(logging, cliArgs.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.info("Set log level to %s", cliArgs.log_level.upper())
+    logging.debug("Set log level to %s", cliArgs.log_level.upper())
     return cliArgs
 
 
@@ -152,7 +152,7 @@ def parseTicketLinkCLI():
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.info("Set log level to %s", cli.log_level.upper())
+    logging.debug("Set log level to %s", cli.log_level.upper())
     return cli
 
 
@@ -171,7 +171,7 @@ def parseTransitionToCLI():
     loglevel = getattr(logging, cliArgs.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.info("Set log level to %s", cliArgs.log_level.upper())
+    logging.debug("Set log level to %s", cliArgs.log_level.upper())
     return cliArgs
 
 
@@ -232,7 +232,7 @@ def createTicket():
         results = jira.createSubtask(issue_data=issue_data, parent=cli.parent)
     else:
         results = jira.createTicket(issue_data=issue_data, strict=False)
-    logging.info(results)
+    print(results)
     return results
 
 
@@ -247,7 +247,7 @@ def getLinkTypes():
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.info("Set log level to %s", cli.log_level.upper())
+    logging.debug("Set log level to %s", cli.log_level.upper())
 
     settings = loadJiraSettings(path=cli.settings_file, cli=cli)
 
@@ -276,7 +276,11 @@ def linkTickets():
     results = jira.linkIssues(
         source=cli.ticket, target=cli.target, link_type=cli.link_type
     )
-    logging.info(results)
+    logging.debug(results)
+    if results:
+        print(f'({cli.link_type}) link created between {cli.ticket} and {cli.target}')
+    else:
+        print(f'Could not create ({cli.link_type})Link between {cli.ticket} and {cli.target}')
     print(results)
 
 
