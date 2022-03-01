@@ -1,5 +1,9 @@
 # jira-commands
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Funixorn%2Fjira-commands%2Fbadge%3Fref%3Dmain&style=plastic)](https://actions-badge.atrox.dev/unixorn/jira-commands/goto?ref=main)
+![Megalinter](https://github.com/unixorn/jira-commands/actions/workflows/mega-linter.yml/badge.svg)
+
 Some command-line tools for interacting with JIRA.
 
 - jc
@@ -20,7 +24,7 @@ The`jc` main driver script will find the subcommands, so you can do `jc ticket c
 
 ## Configuration
 
-The `jc` commands all read settings from `~/.jira-commands/jira.yaml`. Settings in the file can be overriden by specifying command-line options.
+The `jc` commands all read settings from `~/.jira-commands/jira.yaml`. Settings in the file can be overridden by specifying command-line options.
 
 I'm setting my username and jira server in the example below. The tools will ask for my password when I run them.
 
