@@ -2,7 +2,10 @@
   "hasModules": false,
   "threshold": 0,
   "configurations": {
-    "reporters": [ "html", "verbose" ],
+    "reporters": [
+      "html",
+      "verbose"
+    ],
     "format": [
       "csharp",
       "typescript",
@@ -11,7 +14,13 @@
       "cpp",
       "c"
     ],
-    "ignore": [ "**/.github/**", "**/*.yml", "**/github/workspace/.github/workflows/**", "**/github/workspace/.github/linters/**" ],
+    "ignore": [
+      "**/.github/**",
+      "**/*.yml",
+      "**/github/workspace/.github/workflows/**",
+      "**/github/workspace/.github/linters/**",
+      "jira_commands/cli/*.py"
+    ],
     "min-tokens": 200,
     "absolute": true
   }
