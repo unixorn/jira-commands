@@ -6,10 +6,11 @@
 # License: Apache 2.0
 # Copyright 2022, ZScaler Inc.
 
+import json
 import logging
 import sys
 
-from jira_commands.cli.common import parseTicketCLI, ticketCreationParser
+from jira_commands.cli.common import baseCLIParser, parseTicketCLI, ticketCreationParser
 from jira_commands.jira import JiraTool, loadJiraSettings, makeIssueData
 
 
@@ -122,6 +123,39 @@ def parseGetTransitionsCLI():
     return cliArgs
 
 
+def parseTicketLinkCLI():
+    """
+    Command line options for linking two tickets
+    """
+    parser = parseTicketCLI(description="Link two JIRA tickets")
+    parser.add_argument(
+        "--target",
+        type=str,
+        required=True,
+        help="Target ticket",
+    )
+
+    link_types = [
+        "Blocks",
+        "Depends",
+        "Bugs" "Clones",
+    ]
+    parser.add_argument(
+        "--link-type",
+        type=str,
+        required=True,
+        help=f"Link type. Case matters. Consider {link_types} as options, "
+        "though your server may have other types too. 'jc get link types' "
+        "will show all the link types on your JIRA server",
+    )
+    cli = parser.parse_args()
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+    return cli
+
+
 def parseTransitionToCLI():
     """
     Parse the command line options for transition set tool
@@ -185,7 +219,7 @@ def closeTicket():
 
 def createTicket():
     """
-    Main program driver
+    Create a JIRA ticket
     """
     cli = parseCreateTicketCLI()
     logging.debug(f"cli: {cli}")
@@ -195,9 +229,55 @@ def createTicket():
 
     jira = JiraTool(settings=settings)
     if cli.issue_type == "Sub-task":
-        logging.info(jira.createSubtask(issue_data=issue_data, parent=cli.parent))
+        results = jira.createSubtask(issue_data=issue_data, parent=cli.parent)
     else:
-        logging.info(jira.createTicket(issue_data=issue_data, strict=False))
+        results = jira.createTicket(issue_data=issue_data, strict=False)
+    logging.info(results)
+    return results
+
+
+def getLinkTypes():
+    """
+    Get all the link types on a server
+    """
+    parser = baseCLIParser()
+    parser.add_argument("--json", help="Output in JSON format", action="store_true")
+    cli = parser.parse_args()
+
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+
+    link_type_names = []
+    for link_type in jira.connection.issue_link_types():
+        logging.debug(link_type.name)
+        link_type_names.append(link_type.name)
+    if cli.json:
+        print(json.dumps({"link_types": link_type_names}, indent=2))
+    else:
+        print(f"Link type names: {link_type_names}")
+
+
+def linkTickets():
+    """
+    Link two tickets
+    """
+    cli = parseTicketLinkCLI()
+    logging.debug(f"cli: {cli}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    results = jira.linkIssues(
+        source=cli.ticket, target=cli.target, link_type=cli.link_type
+    )
+    logging.info(results)
+    print(results)
 
 
 def getTransitions():
