@@ -86,6 +86,11 @@ def ticketCreationParser(description: str):
         type=str.upper,
     )
     parser.add_argument(
+        "--priority",
+        help="Set priority for the new ticket. Use 'jc get priorites' to find a list of available ticket priorities.",
+        type=str,
+    )
+    parser.add_argument(
         "--project",
         help="What JIRA project to create the new ticket in",
         type=str,
