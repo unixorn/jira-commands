@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.3.1"
+version = "0.4.0"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jblock@zscaler.com>"]
 homepage = "https://github.com/unixorn/jira-commands"
@@ -22,6 +22,8 @@ flake8 = "^4.0.1"
 [tool.poetry.scripts]
 jc = 'jira_commands.cli.jc:jc_driver'
 jc-get-link-types = 'jira_commands.cli.crudops:getLinkTypes'
+jc-get-priorities = 'jira_commands.cli.crudops:getPriorities'
+jc-get-priority-ids = 'jira_commands.cli.crudops:getPriorities'
 jc-link-tickets = 'jira_commands.cli.crudops:linkTickets'
 jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
 jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'

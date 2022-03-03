@@ -213,7 +213,7 @@ class JiraTool:
         else:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
-    def createTicket(self, issue_data: dict, strict=True):
+    def createTicket(self, issue_data: dict, priority: str = None, strict=True):
         """
         Create a JIRA ticket from a data dictionary
         """
@@ -238,6 +238,12 @@ class JiraTool:
                 raise ValueError(
                     f"You must specify all the mandatory issue fields: {required}"
                 )
+
+        if priority:
+            logging.debug(f"Setting ticket priority to {priority}")
+            priority_info = self.getPriorityDict()
+            priority_data = {"id": priority_info[priority]}
+            issue_data["priority"] = priority_data
 
         new_issue = self.connection.create_issue(fields=issue_data)
         return new_issue
@@ -283,6 +289,18 @@ class JiraTool:
             print(
                 f"{singleIssue.key} {singleIssue.fields.summary} {singleIssue.fields.reporter.displayName}"
             )
+
+    def getPriorityDict(self):
+        """
+        Returns a dictionary of all the priorities on a server and their IDs
+        """
+        raw_priorities = self.connection.priorities()
+        priority_data = {}
+
+        for priority in raw_priorities:
+            logging.debug(f"{priority.name} : {priority.id}")
+            priority_data[priority.name] = priority.id
+        return priority_data
 
     def getTicket(self, ticket: str):
         """

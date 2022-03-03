@@ -8,6 +8,7 @@ Some command-line tools for interacting with JIRA.
 
 - jc
 - jc-get-link-types
+- jc-get-priority-ids
 - jc-ticket-assign
 - jc-ticket-close
 - jc-ticket-comment

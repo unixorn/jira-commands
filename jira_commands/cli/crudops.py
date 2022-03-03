@@ -231,9 +231,11 @@ def createTicket():
     if cli.issue_type == "Sub-task":
         results = jira.createSubtask(issue_data=issue_data, parent=cli.parent)
     else:
-        results = jira.createTicket(issue_data=issue_data, strict=False)
+        results = jira.createTicket(
+            issue_data=issue_data, strict=False, priority=cli.priority
+        )
     print(results)
-    return results
+    # return results
 
 
 def getLinkTypes():
@@ -278,10 +280,38 @@ def linkTickets():
     )
     logging.debug(results)
     if results:
-        print(f'({cli.link_type}) link created between {cli.ticket} and {cli.target}')
+        print(f"({cli.link_type}) link created between {cli.ticket} and {cli.target}")
     else:
-        print(f'Could not create ({cli.link_type})Link between {cli.ticket} and {cli.target}')
+        print(
+            f"Could not create ({cli.link_type})Link between {cli.ticket} and {cli.target}"
+        )
     print(results)
+
+
+def getPriorities():
+    """
+    Get all the priorities on a server
+    """
+    parser = baseCLIParser(
+        description="Get list of priorities on a server and their IDs"
+    )
+    parser.add_argument("--json", help="Output in JSON format", action="store_true")
+    cli = parser.parse_args()
+
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.debug("Set log level to %s", cli.log_level.upper())
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    priority_data = jira.getPriorityDict()
+
+    if cli.json:
+        print(json.dumps({"priorities": priority_data}, indent=2))
+    else:
+        print(f"Issue Priorities: {priority_data}")
 
 
 def getTransitions():
