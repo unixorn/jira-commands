@@ -12,11 +12,11 @@ from jira_commands.cli.common import baseCLIParser
 from jira_commands.jira import JiraTool, loadJiraSettings
 
 
-def parsePrintCLI():
+def parseListCLI():
     """
     Parse the command line options
     """
-    parser = baseCLIParser(description="Print JIRA tickets in a project")
+    parser = baseCLIParser(description="List JIRA tickets in a project")
 
     parser.add_argument("--project", "-p", type=str, default="SYSENG")
 
@@ -28,18 +28,18 @@ def parsePrintCLI():
     return cliArgs
 
 
-def printTicket():
+def listTickets():
     """
-    Main program driver
+    List tickets in a project
     """
-    cli = parsePrintCLI()
+    cli = parseListCLI()
     logging.debug(f"cli: {cli}")
 
     settings = loadJiraSettings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    jira.printTickets(project="SYSENG")
+    jira.listTickets(project="SYSENG")
 
 
 if __name__ == "__main__":
-    printTicket()
+    listTickets()
