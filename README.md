@@ -6,22 +6,29 @@
 
 Some command-line tools for interacting with JIRA.
 
-- jc
-- jc-get-link-types
-- jc-get-priority-ids
-- jc-ticket-assign
-- jc-ticket-close
-- jc-ticket-comment
-- jc-ticket-comment-on-ticket
-- jc-ticket-create
-- jc-ticket-examine
-- jc-ticket-link
-- jc-ticket-print
-- jc-ticket-transition-list
-- jc-ticket-transition-set
-- jc-ticket-vivisect
+## Scripts
 
-The`jc` main driver script will find the subcommands, so you can do `jc ticket comment --ticket ABC-123 --comment 'foo bar baz'` and it will find the `jc-ticket-comment` script and run it with the `--ticket` and `--comment` arguments.
+All of these scripts support `--help` to get a detailed list of command line options.
+
+| Name                         | Description                                           |
+| -----------------------------| ----------------------------------------------------- |
+| `jc` | Main driver. Will run all the other commands inside a docker container for you. |
+| `jc assign ticket` / `jc ticket assign` | Assign a ticket to someone. |
+| `jc close ticket` / `jc ticket close` | Close a ticket |
+| `jc comment on ticket` / `jc ticket comment` | Comment on a ticket |
+| `jc create ticket` / `jc ticket create` | Create a ticket. You will need|
+| `jc examine ticket` / `jc ticket examine` | Detailed dump of a ticket and all its custom field names |
+| `jc get link types` | Prints the names of all link types defined on your JIRA instance. |
+| `jc get priority ids` | Prints the names of all ticket priorities defined on your JIRA instance. |
+| `jc link tickets` / `jc ticket link` | Link two tickets. Use `jc get link types` to see what link names are defined on your JIRA server. Case matters. |
+| `jc list project tickets` | List open tickets in a given JIRA project |
+| `jc list ticket transitions` / `jc ticket transition list` | See the availale transitions for a given ticket. |
+| `jc transition ticket to` / `jc ticket transition set` | Transition a ticket to another state. Use `jc list ticket transitions` to see which are available  |
+| `jc vivisect ticket` / `jc ticket vivisect` | Detailed dump of a ticket to find out all the custom field names and other innards. |
+
+The `jc` program is the main driver script and will find the subcommands, so you can do `jc ticket comment --ticket ABC-123 --comment 'foo bar baz'` and it will find the `jc-ticket-comment` script and run it with the `--ticket` and `--comment` arguments.
+
+If you're using the docker method, `jc` will automatically run the subcommands inside a container for you. If you've installed via pip, it'll find the commands where they were installed in your `$PATH`.
 
 ## Configuration
 
@@ -38,15 +45,19 @@ You can specify a `password` key but it's a terrible idea.
 
 ## Installation
 
-### Direct
+### Run via docker / nerdctl
+
+This is the recommended way to use the `jc` commands, and how it will be run if you use one of the ZSH frameworks detailed below.
+
+If you're not using a ZSH framework, clone this repository and add its `bin` directory to your `$PATH`. It contains a `jc` script that will detect whether you have `nerdctl` or `docker` and if it finds them, map `~/jira-commands` (and the configuration file there) into a volume in the `jira-commands` container and run the tools inside the container.
+
+### Direct pip install
 
 `sudo pip install jira-commands` will install the command-line tools via `pip`. This may cause compatibility annoyances with other python tools on your system, so there's a `docker`/`nerdctl` option as well.
 
-### Manually run via docker / nerdctl
-
-If you're not using a ZSH framework, all you have to do is clone this repository and add its `bin` directory to your `$PATH`. It contains a `jc` script that will detect whether you have `nerdctl` or `docker` and if it finds them, map your configuration file into a volume in the `jira-commands` container and run the tools inside the container.
-
 ### ZSH plugin
+
+The tooling has been packaged as a ZSH plugin to make using it as easy as possible for ZSH users.
 
 #### zgenom
 
