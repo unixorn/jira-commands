@@ -282,7 +282,7 @@ class JiraTool:
             jira_server=self.jira_server,
         )
 
-    def printTickets(self, project: str):
+    def listTickets(self, project: str):
         for singleIssue in self.connection.search_issues(
             jql_str=f"project = {project}"
         ):

@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.4.0"
+version = "0.4.1"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jblock@zscaler.com>"]
 homepage = "https://github.com/unixorn/jira-commands"
 repository = "https://github.com/unixorn/jira-commands"
+readme = 'README.md'
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -20,22 +21,40 @@ isort = "^5.10.1"
 flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
+# There are multiple names for some of these for ease of use
 jc = 'jira_commands.cli.jc:jc_driver'
+
+jc-assign-ticket = 'jira_commands.cli.crudops:assignTicket'
+jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
+
+jc-close-ticket = 'jira_commands.cli.crudops:closeTicket'
+jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'
+
+jc-comment-on-ticket = 'jira_commands.cli.crudops:commentOnTicket'
+jc-ticket-comment = 'jira_commands.cli.crudops:commentOnTicket'
+
+jc-create-ticket = 'jira_commands.cli.crudops:createTicket'
+jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
+
+jc-examine-ticket = 'jira_commands.cli.vivisect:vivisect'
+jc-vivisect-ticket = 'jira_commands.cli.vivisect:vivisect'
+jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'
+jc-ticket-vivisect = 'jira_commands.cli.vivisect:vivisect'
+
 jc-get-link-types = 'jira_commands.cli.crudops:getLinkTypes'
 jc-get-priorities = 'jira_commands.cli.crudops:getPriorities'
 jc-get-priority-ids = 'jira_commands.cli.crudops:getPriorities'
+
 jc-link-tickets = 'jira_commands.cli.crudops:linkTickets'
-jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
-jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'
-jc-ticket-comment = 'jira_commands.cli.crudops:commentOnTicket'
-jc-ticket-comment-on-ticket = 'jira_commands.cli.crudops:commentOnTicket'
-jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
-jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-link = 'jira_commands.cli.crudops:linkTickets'
-jc-ticket-print = 'jira_commands.cli.print:printTicket'
+
+jc-list-ticket-transitions = 'jira_commands.cli.crudops:getTransitions'
 jc-ticket-transition-list = 'jira_commands.cli.crudops:getTransitions'
+
+jc-list-project-tickets = 'jira_commands.cli.list:listTickets'
+
 jc-ticket-transition-set = 'jira_commands.cli.crudops:transitionTo'
-jc-ticket-vivisect = 'jira_commands.cli.vivisect:vivisect'
+jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
