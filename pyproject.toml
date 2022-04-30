@@ -41,6 +41,8 @@ jc-vivisect-ticket = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-vivisect = 'jira_commands.cli.vivisect:vivisect'
 
+jc-custom-field-allowed-values = 'jira_commands.cli.vivisect:listAllowedFieldValues'
+
 jc-get-link-types = 'jira_commands.cli.crudops:getLinkTypes'
 jc-get-priorities = 'jira_commands.cli.crudops:getPriorities'
 jc-get-priority-ids = 'jira_commands.cli.crudops:getPriorities'

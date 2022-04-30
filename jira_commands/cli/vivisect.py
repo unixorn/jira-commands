@@ -8,8 +8,9 @@
 # Copyright 2022, ZScaler Inc.
 
 import logging
+import pprint
 
-from jira_commands.cli.common import parseTicketCLI
+from jira_commands.cli.common import parseTicketCLI, baseCLIParser
 from jira_commands.jira import JiraTool, loadJiraSettings
 
 
@@ -43,5 +44,39 @@ def vivisect():
     jira.vivisect(ticket_id=cli.ticket)
 
 
+def parseTicketFieldCLI(description: str):
+    """
+    Parse the command line options and return the ticket id
+    """
+    parser = baseCLIParser(description=description)
+
+    parser.add_argument("--ticket", "-t", type=str, required=True)
+    parser.add_argument("--custom-field", "-c", type=str, required=True)
+    return parser
+
+
+def listAllowedFieldValues():
+    cli = parseTicketFieldCLI(
+        description="Get the allowed values for a ticket's custom field"
+    ).parse_args()
+
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+
+    logging.debug(f"cli: {cli}")
+    logging.debug(f"ticket: {cli.ticket}")
+    logging.debug(f"custom_field: {cli.custom_field}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    jira = JiraTool(settings=settings)
+    print(f"Values for {cli.ticket}'s {cli.custom_field}:")
+    for allowed in jira.allowedValuesForField(
+        ticket=cli.ticket, custom_field=cli.custom_field
+    ):
+        print(f"  {pprint.pformat(allowed,indent=2)}")
+
+
 if __name__ == "__main__":
-    vivisect()
+    raise RuntimeError("This is a library, not meant to run on its own.")
