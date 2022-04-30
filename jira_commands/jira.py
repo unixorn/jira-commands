@@ -213,6 +213,22 @@ class JiraTool:
         else:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
+    def allowedValuesForField(self, ticket: str, custom_field: str):
+        """
+        Get the allowed values for a ticket custom field
+
+        JIRA isn't very forgiving about ticket values, so provide a way to
+        extract what it's expecting to find in a given custom field.
+        """
+        logging.debug(f"connection: {self.connection}")
+
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+
+        meta = self.getIssueMetaData(ticket=ticket)
+        allowed = meta["fields"][custom_field]["allowedValues"]
+        return allowed
+
     def createTicket(self, issue_data: dict, priority: str = None, strict=True):
         """
         Create a JIRA ticket from a data dictionary
@@ -260,6 +276,34 @@ class JiraTool:
             )
         issue_data["parent"] = {"id": parent}
         return self.createTicket(issue_data=issue_data)
+
+    def getIssueData(self, ticket: str):
+        """
+        Returns the JIRA issue data for a ticket
+
+        This is a shim to keep JiraTool users from having to rummage through
+        its internals to use the jira object it's connecting to your jira
+        server with.
+
+        Args:
+            ticket (str): JIRA ticket number
+        """
+        return self.connection.issue(ticket)
+
+    def getIssueMetaData(self, ticket: str):
+        """
+        Get an issue's metadata.
+
+        This is a shim to keep JiraTool users from having to rummage through
+        its internals to use the jira object it's connecting to your jira
+        server with.
+
+        Args:
+            ticket (str): JIRA ticket number
+        """
+        issue = self.getIssueData(ticket=ticket)
+        meta = self.connection.editmeta(issue)
+        return meta
 
     def linkIssues(self, source, target, link_type):
         """
@@ -321,7 +365,6 @@ class JiraTool:
             print(f"  {transition}")
         print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
         print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
-        print(f"ticket.fields.issuelinks repr: {ticket.fields.issuelinks.repr()}")
         print(f"ticket.fields.issuelinks dump: {dumpObject(ticket.fields.issuelinks)}")
         print(f"ticket.fields: {ticket.fields}")
         print()
