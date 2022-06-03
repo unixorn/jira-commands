@@ -162,6 +162,37 @@ def linkIssuesHack(
     return status
 
 
+def updateFieldDict(
+    custom_field: str, field_type: str, fields: dict = None, value=None
+):
+    """
+    Update the optional fields dictionary argument with an entry for the
+    custom field & value specified.
+
+    Returns a dictionary.
+    """
+    if not fields:
+        fields = {}
+
+    if field_type.lower() == "array" or field_type.lower() == "list":
+        fields[custom_field] = [value]
+
+    if field_type.lower() == "choice":
+        fields[custom_field] = {"value": value}
+
+    if field_type.lower() == "multi-select":
+        fields[custom_field] = [{"value": value}]
+
+    if field_type.lower() == "priority":
+        fields[custom_field] = {"name": value}
+
+    if field_type.lower() == "string" or field_type.lower() == "str":
+        fields[custom_field] = value
+
+    logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
+    return fields
+
+
 class JiraTool:
     # Jira housekeeping
     def __init__(self, settings: dict):
@@ -188,6 +219,53 @@ class JiraTool:
         )
         self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
 
+    # Field manipulations
+
+    def allowedValuesForField(self, ticket: str, custom_field: str):
+        """
+        Get the allowed values for a ticket custom field
+
+        JIRA isn't very forgiving about ticket values, so provide a way to
+        extract what it's expecting to find in a given custom field.
+        """
+        logging.debug(f"connection: {self.connection}")
+
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+
+        meta = self.getIssueMetaData(ticket=ticket)
+        allowed = meta["fields"][custom_field]["allowedValues"]
+        return allowed
+
+    def updateField(self, ticket: str, custom_field: str, value, field_type: str):
+        """
+        Update a field on an issue
+        """
+        try:
+            issue = self.getTicket(ticket=ticket)
+            logging.debug("Updating issue: %s", issue)
+            fields = {}
+            fields = updateFieldDict(
+                custom_field=custom_field,
+                value=value,
+                field_type=field_type,
+                fields=fields,
+            )
+            return issue.update(fields=fields)
+        except Exception as jiraConniption:
+            logging.exception(jiraConniption)
+
+    def updateMultipleFields(self, ticket: str, fields: dict):
+        """
+        Update multiple fields from a fields dictionary
+        """
+        try:
+            issue = self.getTicket(ticket=ticket)
+            logging.debug("Updating %s using %s", issue, fields)
+            return issue.update(fields=fields)
+        except Exception as jiraConniption:
+            logging.exception(jiraConniption)
+
     # Utility functions
     def assignTicket(self, ticket: str, assignee: str):
         """
@@ -212,22 +290,6 @@ class JiraTool:
             return self.connection.add_comment(ticket, comment)
         else:
             raise RuntimeError("You must specify a comment to add to the ticket")
-
-    def allowedValuesForField(self, ticket: str, custom_field: str):
-        """
-        Get the allowed values for a ticket custom field
-
-        JIRA isn't very forgiving about ticket values, so provide a way to
-        extract what it's expecting to find in a given custom field.
-        """
-        logging.debug(f"connection: {self.connection}")
-
-        issue = self.getIssueData(ticket)
-        logging.debug(f"issue: {issue}")
-
-        meta = self.getIssueMetaData(ticket=ticket)
-        allowed = meta["fields"][custom_field]["allowedValues"]
-        return allowed
 
     def createTicket(self, issue_data: dict, priority: str = None, strict=True):
         """
@@ -408,7 +470,7 @@ class JiraTool:
         Find the available transitions for a given ticket
         """
 
-        # Map the names to ids so the caller can user a human-understandable
+        # Map the names to ids so the caller can use a human-understandable
         # name instead of having to track down the id.
         transitions = {}
         for t in self.connection.transitions(ticket):
