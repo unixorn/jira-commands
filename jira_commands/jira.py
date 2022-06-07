@@ -175,13 +175,33 @@ def updateFieldDict(
         fields = {}
 
     if field_type.lower() == "array" or field_type.lower() == "list":
-        fields[custom_field] = [value]
+        if custom_field not in fields:
+            fields[custom_field] = []
+            logging.debug("%s not found in fields, creating empty list", custom_field)
+
+        if isinstance(value, list):
+            for v in value:
+                logging.debug("Appending %s to %s", v, fields[custom_field])
+                fields[custom_field].append(v)
+                logging.debug("%s is now %s", custom_field, fields[custom_field])
+        else:
+            logging.debug("Appending %s to %s", value, fields[custom_field])
+            fields[custom_field].append(value)
+            logging.debug("%s is now %s", custom_field, fields[custom_field])
 
     if field_type.lower() == "choice":
         fields[custom_field] = {"value": value}
 
     if field_type.lower() == "multi-select":
-        fields[custom_field] = [{"value": value}]
+        if custom_field not in fields:
+            logging.debug("%s not found in fields, creating empty list", custom_field)
+            fields[custom_field] = []
+        if isinstance(value, list):
+            for v in value:
+                logging.debug("Appending %s to %s", v, fields[custom_field])
+                fields[custom_field].append({"value": v})
+        else:
+            fields[custom_field].append({"value": value})
 
     if field_type.lower() == "priority":
         fields[custom_field] = {"name": value}
@@ -190,6 +210,7 @@ def updateFieldDict(
         fields[custom_field] = value
 
     logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
+    logging.debug("Fields: %s", fields)
     return fields
 
 
