@@ -163,7 +163,7 @@ def linkIssuesHack(
 
 
 def updateFieldDict(
-    custom_field: str, field_type: str, fields: dict = None, value=None
+    custom_field: str, field_type: str, fields: dict = None, value=None, child_data=None
 ):
     """
     Update the optional fields dictionary argument with an entry for the
@@ -202,6 +202,9 @@ def updateFieldDict(
                 fields[custom_field].append({"value": v})
         else:
             fields[custom_field].append({"value": value})
+
+    if field_type.lower() == "parent":
+        fields[custom_field] = {"value": value, "child": {"value": child_data}}
 
     if field_type.lower() == "priority":
         fields[custom_field] = {"name": value}
