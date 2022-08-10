@@ -5,6 +5,23 @@
 ![Megalinter](https://github.com/unixorn/jira-commands/actions/workflows/mega-linter.yml/badge.svg)
 ![PyPI - Format](https://img.shields.io/pypi/format/jira-commands?style=plastic)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+- [jira-commands](#jira-commands)
+  - [Scripts](#scripts)
+  - [Configuration](#configuration)
+  - [Installation](#installation)
+    - [Run via docker / nerdctl](#run-via-docker--nerdctl)
+    - [Direct pip install](#direct-pip-install)
+    - [ZSH plugin](#zsh-plugin)
+      - [zgenom](#zgenom)
+      - [Antigen](#antigen)
+      - [oh-my-zsh](#oh-my-zsh)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Some command-line tools for interacting with JIRA.
 
 ## Scripts
