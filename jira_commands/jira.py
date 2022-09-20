@@ -315,53 +315,65 @@ class JiraTool:
         else:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
-    def createTicket(self, issue_data: dict, priority: str = None, strict=True):
+    def createTicket(
+        self,
+        issue_data: dict,
+        priority: str = None,
+        strict=True,
+        required_fields: list = None,
+    ):
         """
         Create a JIRA ticket from a data dictionary
         """
         logging.debug(f"Creating ticket using {issue_data}")
         # Make sure we have a minimum set of fields
-        required = [
-            "description",
-            "summary",
-            "project",
-            "issuetype",
-        ]
+        logging.debug(f"required_fields: {required_fields}")
+        if not required_fields:
+            required_fields = []
         if strict:
             valid = True
-            for r in required:
+            for r in required_fields:
                 if r not in issue_data:
                     valid = False
                     logging.error(f"{r} not specified in issue_data")
             if not valid:
                 logging.critical(
-                    f"You must specify all the mandatory issue fields: {required}"
+                    f"You must specify all the mandatory issue fields: {required_fields}"
                 )
                 raise ValueError(
-                    f"You must specify all the mandatory issue fields: {required}"
+                    f"You must specify all the mandatory issue fields: {required_fields}"
                 )
-
         if priority:
             logging.debug(f"Setting ticket priority to {priority}")
             priority_info = self.getPriorityDict()
             priority_data = {"id": priority_info[priority]}
             issue_data["priority"] = priority_data
-
+        logging.debug(f"issue_data: {issue_data}")
         new_issue = self.connection.create_issue(fields=issue_data)
+        logging.debug(f"new_issue: {new_issue}")
         return new_issue
 
-    def createSubtask(self, issue_data: dict, parent: str):
+    def createSubtask(
+        self,
+        issue_data: dict,
+        parent: str,
+        required_fields: list = None,
+        strict: bool = True,
+    ):
         """
         Create a subtask
         """
-        logging.warning("Creating a subtask")
+        logging.debug("Creating a subtask")
         if not parent:
             logging.error("You must specify a parent ticket when creating a Sub-Task")
             raise ValueError(
                 "You must specify a parent ticket when creating a Sub-Task"
             )
         issue_data["parent"] = {"id": parent}
-        return self.createTicket(issue_data=issue_data)
+        logging.debug(f"required_fields: {required_fields}")
+        return self.createTicket(
+            issue_data=issue_data, required_fields=required_fields, strict=strict
+        )
 
     def getIssueData(self, ticket: str):
         """
