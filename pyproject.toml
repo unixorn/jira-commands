@@ -36,6 +36,9 @@ jc-ticket-comment = 'jira_commands.cli.crudops:commentOnTicket'
 jc-create-ticket = 'jira_commands.cli.crudops:createTicket'
 jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
 
+jc-ticket-dump-metadata = 'jira_commands.cli.vivisect:dump_metadata'
+jc-ticket-metadata = 'jira_commands.cli.vivisect:dump_metadata'
+
 jc-examine-ticket = 'jira_commands.cli.vivisect:vivisect'
 jc-vivisect-ticket = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'

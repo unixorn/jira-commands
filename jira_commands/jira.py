@@ -115,8 +115,10 @@ def linkIssuesHack(
     This is a horrible hack because the jira module fails with a permission
     error when I use its create_issue_link method, but I can use the same
     username and password with curl against the JIRA API directly and that
-    works, so created an issue upstream and I'm using this requests.get hack
-    until https://github.com/pycontribs/jira/issues/1296 is fixed upstream.
+    works, so I created an issue upstream.
+
+    I'm using this requests.get hack until https://github.com/pycontribs/jira/issues/1296
+    is fixed upstream.
 
     Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
     """
@@ -192,7 +194,7 @@ class JiraTool:
 
     def allowedValuesForField(self, ticket: str, custom_field: str):
         """
-        Get the allowed values for a ticket custom field
+        Get the allowed values for a custom field on an issue
 
         JIRA isn't very forgiving about ticket values, so provide a way to
         extract what it's expecting to find in a given custom field.
@@ -460,6 +462,24 @@ class JiraTool:
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
 
+    def load_customfield_allowed_values(self, ticket: str):
+        """
+        Get the allowed values for all custom fields on a ticket
+
+        JIRA isn't very forgiving about ticket values, so provide a way to
+        extract what it's expecting to find in a given custom field.
+
+        We need this when setting menu type custom fields
+        """
+        logging.debug(f"connection: {self.connection}")
+
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+
+        meta = self.getIssueMetaData(ticket=ticket)
+        allowed = meta["fields"]["custom_field"]["allowedValues"]
+        return allowed
+
     def updateFieldDict(
         self,
         custom_field: str,
@@ -470,7 +490,8 @@ class JiraTool:
     ):
         """
         Update the optional fields dictionary argument with an entry for the
-        custom field & value specified.
+        custom field & value specified. We create a blank fields dictionary if
+        one is not provided.
 
         Returns a dictionary.
         """
@@ -510,8 +531,25 @@ class JiraTool:
             else:
                 fields[custom_field].append({"value": value})
 
+        if field_type.lower() == "menu":
+            # Suck abounds.
+            # JIRA dropdown field value menus are an aggravating sharp edge.
+            # If you have a predefined list of menu items, you can't just
+            # shovel in a string that corresponds to one of those defined
+            # menu items. JIRA isn't smart enough to compare that string to
+            # it's list of allowed values and use it if it's a valid option.
+            #
+            # Instead, you have to figure out what id that corresponds to, and
+            # set _that_. Along with the damn original value, of course.
+            choice_id = 1
+            # allowed_ids = allowedValuesForField(ticket, custom_field=custom_field)
+            fields[custom_field] = {"value": value, "id": choice_id}
+
         if field_type.lower() == "parent":
-            fields[custom_field] = {"value": value, "child": {"value": child_data}}
+            fields[custom_field] = {
+                "value": value,
+                "child": {"value": child_data},
+            }
 
         if field_type.lower() == "priority":
             fields[custom_field] = {"name": value}
@@ -520,5 +558,4 @@ class JiraTool:
             fields[custom_field] = value
 
         logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
-        logging.debug("Fields: %s", fields)
         return fields

@@ -14,6 +14,34 @@ from jira_commands.cli.common import parseTicketCLI, baseCLIParser
 from jira_commands.jira import JiraTool, loadJiraSettings
 
 
+def dump_metadata():
+    """
+    Dump a ticket's metadata
+    """
+    cli = parse_metadata_cli()
+    logging.debug(f"cli: {cli}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    metadata = jira.getIssueMetaData(ticket=cli.ticket)
+    print(f"  {pprint.pformat(metadata, indent=2)}")
+
+
+def parse_metadata_cli():
+    """
+    Parse the command line options for jc-ticket-metadata
+    """
+    parser = parseTicketCLI(description="Dump a ticket's metadata")
+
+    cliArgs = parser.parse_args()
+    loglevel = getattr(logging, cliArgs.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cliArgs.log_level.upper())
+    return cliArgs
+
+
 def parseVivisectCLI():
     """
     Parse the command line options
@@ -75,7 +103,7 @@ def listAllowedFieldValues():
     for allowed in jira.allowedValuesForField(
         ticket=cli.ticket, custom_field=cli.custom_field
     ):
-        print(f"  {pprint.pformat(allowed,indent=2)}")
+        print(f"  {pprint.pformat(allowed, indent=2)}")
 
 
 if __name__ == "__main__":
