@@ -162,61 +162,6 @@ def linkIssuesHack(
     return status
 
 
-def updateFieldDict(
-    custom_field: str, field_type: str, fields: dict = None, value=None, child_data=None
-):
-    """
-    Update the optional fields dictionary argument with an entry for the
-    custom field & value specified.
-
-    Returns a dictionary.
-    """
-    if not fields:
-        fields = {}
-
-    if field_type.lower() == "array" or field_type.lower() == "list":
-        if custom_field not in fields:
-            fields[custom_field] = []
-            logging.debug("%s not found in fields, creating empty list", custom_field)
-
-        if isinstance(value, list):
-            for v in value:
-                logging.debug("Appending %s to %s", v, fields[custom_field])
-                fields[custom_field].append(v)
-                logging.debug("%s is now %s", custom_field, fields[custom_field])
-        else:
-            logging.debug("Appending %s to %s", value, fields[custom_field])
-            fields[custom_field].append(value)
-            logging.debug("%s is now %s", custom_field, fields[custom_field])
-
-    if field_type.lower() == "choice":
-        fields[custom_field] = {"value": value}
-
-    if field_type.lower() == "multi-select":
-        if custom_field not in fields:
-            logging.debug("%s not found in fields, creating empty list", custom_field)
-            fields[custom_field] = []
-        if isinstance(value, list):
-            for v in value:
-                logging.debug("Appending %s to %s", v, fields[custom_field])
-                fields[custom_field].append({"value": v})
-        else:
-            fields[custom_field].append({"value": value})
-
-    if field_type.lower() == "parent":
-        fields[custom_field] = {"value": value, "child": {"value": child_data}}
-
-    if field_type.lower() == "priority":
-        fields[custom_field] = {"name": value}
-
-    if field_type.lower() == "string" or field_type.lower() == "str":
-        fields[custom_field] = value
-
-    logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
-    logging.debug("Fields: %s", fields)
-    return fields
-
-
 class JiraTool:
     # Jira housekeeping
     def __init__(self, settings: dict):
@@ -269,7 +214,7 @@ class JiraTool:
             issue = self.getTicket(ticket=ticket)
             logging.debug("Updating issue: %s", issue)
             fields = {}
-            fields = updateFieldDict(
+            fields = self.updateFieldDict(
                 custom_field=custom_field,
                 value=value,
                 field_type=field_type,
@@ -514,3 +459,66 @@ class JiraTool:
             transitions[t["name"]] = t["id"]
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
+
+    def updateFieldDict(
+        self,
+        custom_field: str,
+        field_type: str,
+        fields: dict = None,
+        value=None,
+        child_data=None,
+    ):
+        """
+        Update the optional fields dictionary argument with an entry for the
+        custom field & value specified.
+
+        Returns a dictionary.
+        """
+        if not fields:
+            fields = {}
+
+        if field_type.lower() == "array" or field_type.lower() == "list":
+            if custom_field not in fields:
+                fields[custom_field] = []
+                logging.debug(
+                    "%s not found in fields, creating empty list", custom_field
+                )
+
+            if isinstance(value, list):
+                for v in value:
+                    logging.debug("Appending %s to %s", v, fields[custom_field])
+                    fields[custom_field].append(v)
+                    logging.debug("%s is now %s", custom_field, fields[custom_field])
+            else:
+                logging.debug("Appending %s to %s", value, fields[custom_field])
+                fields[custom_field].append(value)
+                logging.debug("%s is now %s", custom_field, fields[custom_field])
+
+        if field_type.lower() == "choice":
+            fields[custom_field] = {"value": value}
+
+        if field_type.lower() == "multi-select":
+            if custom_field not in fields:
+                logging.debug(
+                    "%s not found in fields, creating empty list", custom_field
+                )
+                fields[custom_field] = []
+            if isinstance(value, list):
+                for v in value:
+                    logging.debug("Appending %s to %s", v, fields[custom_field])
+                    fields[custom_field].append({"value": v})
+            else:
+                fields[custom_field].append({"value": value})
+
+        if field_type.lower() == "parent":
+            fields[custom_field] = {"value": value, "child": {"value": child_data}}
+
+        if field_type.lower() == "priority":
+            fields[custom_field] = {"name": value}
+
+        if field_type.lower() == "string" or field_type.lower() == "str":
+            fields[custom_field] = value
+
+        logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
+        logging.debug("Fields: %s", fields)
+        return fields
