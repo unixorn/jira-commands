@@ -477,7 +477,24 @@ class JiraTool:
         logging.debug(f"issue: {issue}")
 
         meta = self.getIssueMetaData(ticket=ticket)
-        allowed = meta["fields"]["custom_field"]["allowedValues"]
+
+        allowed = {}
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+        for field in fields:
+            logging.debug(f"Scanning {field}")
+            if "allowedValues" in fields[field]:
+                logging.info(
+                    f"Field {field} has an allowedValues list, converting to dict"
+                )
+                logging.debug(f"Found {fields[field]['allowedValues']}")
+                data = {}
+                for opt in fields[field]["allowedValues"]:
+                    if ("value" in opt) and ("id" in opt):
+                        data[opt["value"]] = opt["id"]
+                        logging.debug(f"Setting data['{opt['value']}'] to {opt['id']}")
+                allowed[field] = data
+        logging.debug(f"allowed: {allowed}")
         return allowed
 
     def updateFieldDict(
@@ -538,7 +555,7 @@ class JiraTool:
             # shovel in a string that corresponds to one of those defined
             # menu items. JIRA isn't smart enough to compare that string to
             # it's list of allowed values and use it if it's a valid option.
-            #
+
             # Instead, you have to figure out what id that corresponds to, and
             # set _that_. Along with the damn original value, of course.
             choice_id = 1

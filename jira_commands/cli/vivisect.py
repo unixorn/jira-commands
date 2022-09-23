@@ -14,6 +14,34 @@ from jira_commands.cli.common import parseTicketCLI, baseCLIParser
 from jira_commands.jira import JiraTool, loadJiraSettings
 
 
+def dump_all_customfield_allowed_values():
+    """
+    Dump all the customfield allowed options for a given ticket
+    """
+    cli = parse_dump_all_customfields_cli()
+    logging.debug(f"cli: {cli}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    allowed_dict = jira.load_customfield_allowed_values(ticket=cli.ticket)
+    print(f"{pprint.pformat(allowed_dict, indent=2)}")
+
+
+def parse_dump_all_customfields_cli():
+    """
+    Parse the command line options for jc-ticket-dump-all-customfields
+    """
+    parser = parseTicketCLI(description="Dump a ticket's metadata")
+
+    cliArgs = parser.parse_args()
+    loglevel = getattr(logging, cliArgs.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cliArgs.log_level.upper())
+    return cliArgs
+
+
 def dump_metadata():
     """
     Dump a ticket's metadata
