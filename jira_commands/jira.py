@@ -408,10 +408,14 @@ class JiraTool:
         print("ticket transitions available:")
         for transition in self.connection.transitions(ticket):
             print(f"  {transition}")
+        print()
         print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
         print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
         print(f"ticket.fields.issuelinks dump: {dumpObject(ticket.fields.issuelinks)}")
+        print()
         print(f"ticket.fields: {ticket.fields}")
+        print()
+        print(f"dir(ticket): {dir(ticket)}")
         print()
         print(f"ticket.fields (dump): {dumpObject(ticket.fields)}")
 
@@ -448,6 +452,14 @@ class JiraTool:
             )
 
     # Internal helpers
+    def initialize_customfield_mappings(self, ticket: str):
+        """
+        Load all the customfield value mappings and stuff them into the JIRA
+        object's self.customfield_mappings property.
+        """
+        logging.info(f"Loading customfield id mappings from {ticket}...")
+        self.customfield_mappings = self.load_customfield_allowed_values(ticket=ticket)
+
     def ticketTransitions(self, ticket: str):
         """
         Find the available transitions for a given ticket
@@ -548,7 +560,7 @@ class JiraTool:
             else:
                 fields[custom_field].append({"value": value})
 
-        if field_type.lower() == "menu":
+        if field_type.lower() == "menu" or field_type.lower() == "dropdown":
             # Suck abounds.
             # JIRA dropdown field value menus are an aggravating sharp edge.
             # If you have a predefined list of menu items, you can't just
@@ -558,8 +570,11 @@ class JiraTool:
 
             # Instead, you have to figure out what id that corresponds to, and
             # set _that_. Along with the damn original value, of course.
-            choice_id = 1
-            # allowed_ids = allowedValuesForField(ticket, custom_field=custom_field)
+            if not self.customfield_mappings:
+                raise RuntimeError(
+                    "Tried to set a menu field before loading field mappings"
+                )
+            choice_id = self.customfield_mappings[custom_field][value]
             fields[custom_field] = {"value": value, "id": choice_id}
 
         if field_type.lower() == "parent":
