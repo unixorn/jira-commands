@@ -115,8 +115,10 @@ def linkIssuesHack(
     This is a horrible hack because the jira module fails with a permission
     error when I use its create_issue_link method, but I can use the same
     username and password with curl against the JIRA API directly and that
-    works, so created an issue upstream and I'm using this requests.get hack
-    until https://github.com/pycontribs/jira/issues/1296 is fixed upstream.
+    works, so I created an issue upstream.
+
+    I'm using this requests.get hack until https://github.com/pycontribs/jira/issues/1296
+    is fixed upstream.
 
     Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
     """
@@ -162,61 +164,6 @@ def linkIssuesHack(
     return status
 
 
-def updateFieldDict(
-    custom_field: str, field_type: str, fields: dict = None, value=None, child_data=None
-):
-    """
-    Update the optional fields dictionary argument with an entry for the
-    custom field & value specified.
-
-    Returns a dictionary.
-    """
-    if not fields:
-        fields = {}
-
-    if field_type.lower() == "array" or field_type.lower() == "list":
-        if custom_field not in fields:
-            fields[custom_field] = []
-            logging.debug("%s not found in fields, creating empty list", custom_field)
-
-        if isinstance(value, list):
-            for v in value:
-                logging.debug("Appending %s to %s", v, fields[custom_field])
-                fields[custom_field].append(v)
-                logging.debug("%s is now %s", custom_field, fields[custom_field])
-        else:
-            logging.debug("Appending %s to %s", value, fields[custom_field])
-            fields[custom_field].append(value)
-            logging.debug("%s is now %s", custom_field, fields[custom_field])
-
-    if field_type.lower() == "choice":
-        fields[custom_field] = {"value": value}
-
-    if field_type.lower() == "multi-select":
-        if custom_field not in fields:
-            logging.debug("%s not found in fields, creating empty list", custom_field)
-            fields[custom_field] = []
-        if isinstance(value, list):
-            for v in value:
-                logging.debug("Appending %s to %s", v, fields[custom_field])
-                fields[custom_field].append({"value": v})
-        else:
-            fields[custom_field].append({"value": value})
-
-    if field_type.lower() == "parent":
-        fields[custom_field] = {"value": value, "child": {"value": child_data}}
-
-    if field_type.lower() == "priority":
-        fields[custom_field] = {"name": value}
-
-    if field_type.lower() == "string" or field_type.lower() == "str":
-        fields[custom_field] = value
-
-    logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
-    logging.debug("Fields: %s", fields)
-    return fields
-
-
 class JiraTool:
     # Jira housekeeping
     def __init__(self, settings: dict):
@@ -247,7 +194,7 @@ class JiraTool:
 
     def allowedValuesForField(self, ticket: str, custom_field: str):
         """
-        Get the allowed values for a ticket custom field
+        Get the allowed values for a custom field on an issue
 
         JIRA isn't very forgiving about ticket values, so provide a way to
         extract what it's expecting to find in a given custom field.
@@ -269,7 +216,7 @@ class JiraTool:
             issue = self.getTicket(ticket=ticket)
             logging.debug("Updating issue: %s", issue)
             fields = {}
-            fields = updateFieldDict(
+            fields = self.updateFieldDict(
                 custom_field=custom_field,
                 value=value,
                 field_type=field_type,
@@ -315,53 +262,65 @@ class JiraTool:
         else:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
-    def createTicket(self, issue_data: dict, priority: str = None, strict=True):
+    def createTicket(
+        self,
+        issue_data: dict,
+        priority: str = None,
+        strict=True,
+        required_fields: list = None,
+    ):
         """
         Create a JIRA ticket from a data dictionary
         """
         logging.debug(f"Creating ticket using {issue_data}")
         # Make sure we have a minimum set of fields
-        required = [
-            "description",
-            "summary",
-            "project",
-            "issuetype",
-        ]
+        logging.debug(f"required_fields: {required_fields}")
+        if not required_fields:
+            required_fields = []
         if strict:
             valid = True
-            for r in required:
+            for r in required_fields:
                 if r not in issue_data:
                     valid = False
                     logging.error(f"{r} not specified in issue_data")
             if not valid:
                 logging.critical(
-                    f"You must specify all the mandatory issue fields: {required}"
+                    f"You must specify all the mandatory issue fields: {required_fields}"
                 )
                 raise ValueError(
-                    f"You must specify all the mandatory issue fields: {required}"
+                    f"You must specify all the mandatory issue fields: {required_fields}"
                 )
-
         if priority:
             logging.debug(f"Setting ticket priority to {priority}")
             priority_info = self.getPriorityDict()
             priority_data = {"id": priority_info[priority]}
             issue_data["priority"] = priority_data
-
+        logging.debug(f"issue_data: {issue_data}")
         new_issue = self.connection.create_issue(fields=issue_data)
+        logging.debug(f"new_issue: {new_issue}")
         return new_issue
 
-    def createSubtask(self, issue_data: dict, parent: str):
+    def createSubtask(
+        self,
+        issue_data: dict,
+        parent: str,
+        required_fields: list = None,
+        strict: bool = True,
+    ):
         """
         Create a subtask
         """
-        logging.warning("Creating a subtask")
+        logging.debug("Creating a subtask")
         if not parent:
             logging.error("You must specify a parent ticket when creating a Sub-Task")
             raise ValueError(
                 "You must specify a parent ticket when creating a Sub-Task"
             )
         issue_data["parent"] = {"id": parent}
-        return self.createTicket(issue_data=issue_data)
+        logging.debug(f"required_fields: {required_fields}")
+        return self.createTicket(
+            issue_data=issue_data, required_fields=required_fields, strict=strict
+        )
 
     def getIssueData(self, ticket: str):
         """
@@ -449,10 +408,14 @@ class JiraTool:
         print("ticket transitions available:")
         for transition in self.connection.transitions(ticket):
             print(f"  {transition}")
+        print()
         print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
         print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
         print(f"ticket.fields.issuelinks dump: {dumpObject(ticket.fields.issuelinks)}")
+        print()
         print(f"ticket.fields: {ticket.fields}")
+        print()
+        print(f"dir(ticket): {dir(ticket)}")
         print()
         print(f"ticket.fields (dump): {dumpObject(ticket.fields)}")
 
@@ -489,6 +452,14 @@ class JiraTool:
             )
 
     # Internal helpers
+    def initialize_customfield_mappings(self, ticket: str):
+        """
+        Load all the customfield value mappings and stuff them into the JIRA
+        object's self.customfield_mappings property.
+        """
+        logging.info(f"Loading customfield id mappings from {ticket}...")
+        self.customfield_mappings = self.load_customfield_allowed_values(ticket=ticket)
+
     def ticketTransitions(self, ticket: str):
         """
         Find the available transitions for a given ticket
@@ -502,3 +473,121 @@ class JiraTool:
             transitions[t["name"]] = t["id"]
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
+
+    def load_customfield_allowed_values(self, ticket: str):
+        """
+        Get the allowed values for all custom fields on a ticket
+
+        JIRA isn't very forgiving about ticket values, so provide a way to
+        extract what it's expecting to find in a given custom field.
+
+        We need this when setting menu type custom fields
+        """
+        logging.debug(f"connection: {self.connection}")
+
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+
+        meta = self.getIssueMetaData(ticket=ticket)
+
+        allowed = {}
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+        for field in fields:
+            logging.debug(f"Scanning {field}")
+            if "allowedValues" in fields[field]:
+                logging.info(
+                    f"Field {field} has an allowedValues list, converting to dict"
+                )
+                logging.debug(f"Found {fields[field]['allowedValues']}")
+                data = {}
+                for opt in fields[field]["allowedValues"]:
+                    if ("value" in opt) and ("id" in opt):
+                        data[opt["value"]] = opt["id"]
+                        logging.debug(f"Setting data['{opt['value']}'] to {opt['id']}")
+                allowed[field] = data
+        logging.debug(f"allowed: {allowed}")
+        return allowed
+
+    def updateFieldDict(
+        self,
+        custom_field: str,
+        field_type: str,
+        fields: dict = None,
+        value=None,
+        child_data=None,
+    ):
+        """
+        Update the optional fields dictionary argument with an entry for the
+        custom field & value specified. We create a blank fields dictionary if
+        one is not provided.
+
+        Returns a dictionary.
+        """
+        if not fields:
+            fields = {}
+
+        if field_type.lower() == "array" or field_type.lower() == "list":
+            if custom_field not in fields:
+                fields[custom_field] = []
+                logging.debug(
+                    "%s not found in fields, creating empty list", custom_field
+                )
+
+            if isinstance(value, list):
+                for v in value:
+                    logging.debug("Appending %s to %s", v, fields[custom_field])
+                    fields[custom_field].append(v)
+                    logging.debug("%s is now %s", custom_field, fields[custom_field])
+            else:
+                logging.debug("Appending %s to %s", value, fields[custom_field])
+                fields[custom_field].append(value)
+                logging.debug("%s is now %s", custom_field, fields[custom_field])
+
+        if field_type.lower() == "choice":
+            fields[custom_field] = {"value": value}
+
+        if field_type.lower() == "multi-select":
+            if custom_field not in fields:
+                logging.debug(
+                    "%s not found in fields, creating empty list", custom_field
+                )
+                fields[custom_field] = []
+            if isinstance(value, list):
+                for v in value:
+                    logging.debug("Appending %s to %s", v, fields[custom_field])
+                    fields[custom_field].append({"value": v})
+            else:
+                fields[custom_field].append({"value": value})
+
+        if field_type.lower() == "menu" or field_type.lower() == "dropdown":
+            # Suck abounds.
+            # JIRA dropdown field value menus are an aggravating sharp edge.
+            # If you have a predefined list of menu items, you can't just
+            # shovel in a string that corresponds to one of those defined
+            # menu items. JIRA isn't smart enough to compare that string to
+            # it's list of allowed values and use it if it's a valid option.
+
+            # Instead, you have to figure out what id that corresponds to, and
+            # set _that_. Along with the damn original value, of course.
+            if not self.customfield_mappings:
+                raise RuntimeError(
+                    "Tried to set a menu field before loading field mappings"
+                )
+            choice_id = self.customfield_mappings[custom_field][value]
+            fields[custom_field] = {"value": value, "id": choice_id}
+
+        if field_type.lower() == "parent":
+            fields[custom_field] = {
+                "value": value,
+                "child": {"value": child_data},
+            }
+
+        if field_type.lower() == "priority":
+            fields[custom_field] = {"name": value}
+
+        if field_type.lower() == "string" or field_type.lower() == "str":
+            fields[custom_field] = value
+
+        logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
+        return fields
