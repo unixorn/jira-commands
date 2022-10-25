@@ -9,16 +9,17 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents
 
-- [jira-commands](#jira-commands)
-  - [Scripts](#scripts)
-  - [Configuration](#configuration)
-  - [Installation](#installation)
-    - [Run via docker / nerdctl](#run-via-docker--nerdctl)
-    - [Direct pip install](#direct-pip-install)
-    - [ZSH plugin](#zsh-plugin)
-      - [zgenom](#zgenom)
-      - [Antigen](#antigen)
-      - [oh-my-zsh](#oh-my-zsh)
+- [Scripts](#scripts)
+- [Configuration](#configuration)
+  - [Basic Authentication](#basic-authentication)
+  - [OAuth Authentication](#oauth-authentication)
+- [Installation](#installation)
+  - [Run via docker / nerdctl](#run-via-docker--nerdctl)
+  - [Direct pip install](#direct-pip-install)
+  - [ZSH plugin](#zsh-plugin)
+    - [zgenom](#zgenom)
+    - [Antigen](#antigen)
+    - [oh-my-zsh](#oh-my-zsh)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -53,14 +54,29 @@ If you're using the docker method, `jc` will automatically run the subcommands i
 
 The `jc` commands all read settings from `~/.jira-commands/jira.yaml`. Settings in the file can be overridden by specifying command-line options.
 
+### Basic Authentication
+
 I'm setting my username and jira server in the example below. The tools will ask for my password when I run them.
 
 ```yaml
-username: yourusername
 jira_server: https://jira.example.com
+username: yourusername
 ```
 
 You can specify a `password` key but it's a terrible idea.
+
+### OAuth Authentication
+
+Here's an example settings file for oauth authentication. Add `--auth=OAUTH` to use oath instead of basic authentication.
+
+```yaml
+jira_server: https://jira.example.com/
+oauth_access_token: ABCDabcdABCDabcdABCDabcdABCDabcd
+oauth_access_token_secret: ABCDabcdABCDabcdABCDabcdABCDabcd
+oauth_consumer_key: OAUTH_CONSUMER_KEY_ID
+oauth_private_key_pem_pathL: /path/to/pem/file
+username: JIRA_USER
+```
 
 ## Installation
 

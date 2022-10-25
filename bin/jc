@@ -7,6 +7,11 @@
 # License: Apache 2.0
 # shellcheck disable=SC2003
 
+set -o pipefail
+if [[ "$VERBOSE" -gt 0 ]]; then
+  set -x
+fi
+
 function debug() {
   if [[ -n "$DEBUG" ]]; then
     echo "$@"
@@ -59,19 +64,18 @@ check-for-image-update() {
   fi
 }
 
-set -o pipefail
-if [[ "$DEBUG" -gt 0 ]]; then
-  set -x
-fi
 
-SETTINGS_D="$HOME/.jira-commands"
-PULL_COOKIE_F="$SETTINGS_D/last-image-pull"
-PULL_INTERVAL_IN_DAYS="${PULL_INTERVAL_IN_DAYS:-14}"
-CONTAINER_TOOL='NONE'
-JIRA_COMMAND_IMAGE='unixorn/jira-commands'
+SETTINGS_D=${SETTINGS_D:-"$HOME/.jira-commands"}
+CONTAINER_TOOL=${CONTAINER_TOOL:-'NONE'}
+JIRA_COMMAND_IMAGE=${JIRA_COMMAND_IMAGE:-'unixorn/jira-commands'}
+PULL_COOKIE_F=${PULL_COOKIE_F:-"$SETTINGS_D/last-image-pull"}
+PULL_INTERVAL_IN_DAYS=${PULL_INTERVAL_IN_DAYS:-"${PULL_INTERVAL_IN_DAYS:-14}"}
 
-debug "SETTINGS_D: $SETTINGS_D"
+debug "CONTAINER_TOOL: $CONTAINER_TOOL"
+debug "JIRA_COMMAND_IMAGE: $JIRA_COMMAND_IMAGE"
+debug "PULL_COOKIE_F: $PULL_COOKIE_F"
 debug "PULL_INTERVAL_IN_DAYS: $PULL_INTERVAL_IN_DAYS"
+debug "SETTINGS_D: $SETTINGS_D"
 
 # List in descending preference order so we use `nerdctl` instead of `docker`
 # when both are present - we prefer to use `nerdctl` because on my 
@@ -94,4 +98,4 @@ if [[ $CONTAINER_TOOL == 'NONE' ]]; then
   fail "Can't find a tool to run jc jira commands in a container"
 fi
 check-for-image-update
-exec "$CONTAINER_TOOL" run -v "$HOME"/.jira-commands:/config --rm -it "$JIRA_COMMAND_IMAGE" jc "$@"
+exec "$CONTAINER_TOOL" run -v "${SETTINGS_D}":/config --rm -it "$JIRA_COMMAND_IMAGE" jc "$@"

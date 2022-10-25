@@ -22,6 +22,7 @@ def loadJiraSettings(path: str, cli):
     Load JIRA settings from a yaml file, allowing overrides from the CLI
     """
     settings = readYamlFile(path=path)
+
     # Command line arguments should override the settings file
     if cli.server:
         settings["jira_server"] = cli.server
@@ -32,29 +33,69 @@ def loadJiraSettings(path: str, cli):
     if cli.password:
         settings["password"] = cli.password
 
-    if "username" not in settings:
-        settings["username"] = input("Username: ")
+    if cli.oauth_access_token:
+        settings["oauth_access_token"] = cli.oauth_access_token
+    if cli.oauth_access_token_secret:
+        settings["oauth_access_token_secret"] = cli.oauth_access_token_secret
+    if cli.oauth_consumer_key:
+        settings["oauth_consumer_key"] = cli.oauth_consumer_key
+    if cli.oauth_private_key_pem_path:
+        settings["oauth_private_key_pem_path"] = cli.oauth_private_key_pem_path
 
-    if "password" not in settings:
-        settings["password"] = getpass.getpass("Password: ")
+    if cli.auth:
+        settings["auth"] = cli.auth
 
     # Make sure we have all the settings we need
     if "jira_server" not in settings:
         raise RuntimeError("You must specify the jira server")
-    if not settings["username"]:
-        raise RuntimeError("You must specify the jira server username")
-    if not settings["password"]:
-        raise RuntimeError("You must specify the jira server password")
+
+    if cli.auth == "BASIC":
+        # We can fall back to asking the user if we're doing basic auth
+        if "username" not in settings:
+            settings["username"] = input("Username: ")
+
+        if "password" not in settings:
+            settings["password"] = getpass.getpass("Password: ")
+
+    if cli.auth == "BASIC":
+        if not settings["username"]:
+            raise RuntimeError("You must specify the jira server username")
+        if not settings["password"]:
+            raise RuntimeError("You must specify the jira server password")
+
+        credentials = {
+            "username": settings["username"],
+            "password": settings["password"],
+        }
+        if "credentials" not in settings:
+            logging.debug("Setting credentials key in settings")
+            settings["credentials"] = credentials
+        else:
+            logging.warning(f"There is already a credentials key in {path}")
+
+    if cli.auth == "OAUTH":
+        # We need all of these when auth is set to OAUTH
+        logging.info(f"settings: {settings}")
+        if "oauth_access_token" not in settings:
+            raise RuntimeError(
+                "You must specify an Oauth access_token when auth is set to OAUTH"
+            )
+        if "oauth_access_token_secret" not in settings:
+            raise RuntimeError(
+                "You must specify an Oauth access_token_secret when auth is set to OAUTH"
+            )
+        if "oauth_consumer_key" not in settings:
+            raise RuntimeError(
+                "You must specify an Oauth consumer_key when auth is set to OAUTH"
+            )
+        if "oauth_private_key_pem_path" not in settings:
+            raise RuntimeError(
+                "You must specify the path to a pem file containing the Oauth private key when auth is set to OAUTH"
+            )
 
     logging.debug(f"Using JIRA server: {settings['jira_server']}")
     logging.debug(f"username: {settings['username']}")
 
-    credentials = {"username": settings["username"], "password": settings["password"]}
-    if "credentials" not in settings:
-        logging.debug("Setting credentials key in settings")
-        settings["credentials"] = credentials
-    else:
-        logging.warning(f"There is already a credentials key in {path}")
     return settings
 
 
@@ -170,10 +211,22 @@ class JiraTool:
         """
         Create a JIRA helper object
         """
-        self.username = settings["username"]
-        self.password = settings["password"]
+        if "username" in settings:
+            self.username = settings["username"]
+        if "password" in settings:
+            self.password = settings["password"]
         self.jira_server = settings["jira_server"]
-        self.connect()
+
+        # Load OAUTH credentials
+        if "oauth_access_token" in settings:
+            self.oauth_access_token = settings["oauth_access_token"]
+        if "oauth_access_token_secret" in settings:
+            self.oauth_access_token_secret = settings["oauth_access_token_secret"]
+        if "oauth_consumer_key" in settings:
+            self.oauth_consumer_key = settings["oauth_consumer_key"]
+        if "oauth_private_key_pem_path" in settings:
+            self.oauth_private_key_pem_path = settings["oauth_private_key_pem_path"]
+        self.connect(auth=settings["auth"])
 
     def __str__(self):
         """
@@ -182,13 +235,25 @@ class JiraTool:
         raw = {"username": self.username, "jira_server": self.jira_server}
         return raw.__str__()
 
-    def connect(self):
+    def connect(self, auth: str = "BASIC"):
         jiraOptions = {"server": self.jira_server}
-        jiraBasicAuth = (self.username, self.password)
-        logging.debug(
-            f"Creating connection to {self.jira_server} with user {self.username}"
-        )
-        self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
+        if auth == "BASIC":
+            jiraBasicAuth = (self.username, self.password)
+            logging.debug(
+                f"Creating connection to {self.jira_server} with user {self.username}"
+            )
+            self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
+        if auth == "OAUTH":
+            with open(self.oauth_private_key_pem_path, "r") as key_cert_file:
+                key_cert_data = key_cert_file.read()
+
+            oauth_dict = {
+                "access_token": self.oauth_access_token,
+                "access_token_secret": self.oauth_access_token_secret,
+                "consumer_key": self.oauth_consumer_key,
+                "key_cert": key_cert_data,
+            }
+            self.connection = JIRA(options=jiraOptions, oauth=oauth_dict)
 
     # Field manipulations
 

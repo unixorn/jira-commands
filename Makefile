@@ -27,7 +27,7 @@ verbose_tests: verbose_test
 verbose_test:
 	nosetests -v
 
-wheel: clean format
+wheel: clean format requirements.txt
 	poetry build
 
 local: wheel
@@ -42,3 +42,6 @@ clean:
 
 fat:
 	make fatimage
+
+requirements.txt: poetry.lock Makefile
+	poetry export -o requirements.txt --without-hashes

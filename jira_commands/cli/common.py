@@ -26,6 +26,39 @@ def baseCLIParser(description: str = None):
         choices=["DEBUG", "INFO", "ERROR", "WARNING", "CRITICAL"],
         default="INFO",
     )
+    parser.add_argument(
+        "--auth",
+        "--auth-type",
+        type=str.upper,
+        help="Set authentication method to use.",
+        choices=["BASIC", "OAUTH"],
+        default="BASIC",
+    )
+    parser.add_argument(
+        "--oauth-access-token",
+        "--oauth-access_token",
+        help="Oauth access_token",
+        type=str,
+    )
+    parser.add_argument(
+        "--oauth-access-token-secret",
+        "--oauth-access_token_secret",
+        help="Oauth access_token_secret",
+        type=str,
+    )
+    parser.add_argument(
+        "--oauth-consumer-key",
+        "--oauth-consumer_key",
+        help="Oauth consumer_key",
+        type=str,
+    )
+    parser.add_argument(
+        "--oauth-private-key-pem-path",
+        "--oauth-pem-path",
+        "--oauth-pem_path",
+        help="Path to file containing a PEM format Oauth private key",
+        type=str,
+    )
 
     # We have different default settings file paths based on whether we're
     # running in a container, on a server, or on a laptop.
