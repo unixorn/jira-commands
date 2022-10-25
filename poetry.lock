@@ -326,7 +326,7 @@ six = ">=1.5"
 
 [[package]]
 name = "pytz"
-version = "2022.2.1"
+version = "2022.5"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
@@ -394,11 +394,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "thelogrus"
-version = "0.6.3"
+version = "0.7.0"
 description = "The Logrus is a collection of random utility functions"
 category = "main"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
 dateutils = ">=0.6.12,<0.7.0"
@@ -444,7 +444,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "69fabb4027b9cca8fb9a9c6ca8293080c4dea9cba3d52ad2a03de2b32069f8bd"
+content-hash = "476f3bb12ae3030adb702e7e1d7dfe8884748c5a43d41253077ae49a44ef18de"
 
 [metadata.files]
 atomicwrites = []
@@ -583,10 +583,7 @@ six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
-thelogrus = [
-    {file = "thelogrus-0.6.3-py3-none-any.whl", hash = "sha256:3782bd5638c2651b0ccd17c04ff1edf8e3dbe0a56e4ff6b01b7051e3534eaa31"},
-    {file = "thelogrus-0.6.3.tar.gz", hash = "sha256:1c99d3549fb4cdcd2dbf36aa77dc9dc1e4783870a9ca78586414a06a653245d7"},
-]
+thelogrus = []
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
