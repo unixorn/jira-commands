@@ -1,4 +1,9 @@
 FROM unixorn/debian-py3
+ARG application_version=0.0
+LABEL maintainer="Joe Block <jblock@zscaler.com>"
+LABEL description="jira-commands tooling on a debian bullseye base"
+LABEL version=${application_version}
+
 RUN mkdir -p /data && mkdir -p /config
 
 COPY dist/*.whl /data
