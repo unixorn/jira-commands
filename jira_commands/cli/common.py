@@ -31,7 +31,7 @@ def baseCLIParser(description: str = None):
         "--auth-type",
         type=str.upper,
         help="Set authentication method to use.",
-        choices=["BASIC", "OAUTH"],
+        choices=["BASIC", "OAUTH", "PAT"],
         default="BASIC",
     )
     parser.add_argument(
@@ -57,6 +57,12 @@ def baseCLIParser(description: str = None):
         "--oauth-pem-path",
         "--oauth-pem_path",
         help="Path to file containing a PEM format Oauth private key",
+        type=str,
+    )
+    parser.add_argument(
+        "--pat-token",
+        "--pat-authentication-token",
+        help="PAT authentication token",
         type=str,
     )
 

@@ -10,7 +10,6 @@ import getpass
 import json
 import logging
 import requests
-from requests.auth import HTTPBasicAuth
 
 from jira import JIRA
 from jira_commands.utils import dumpObject
@@ -33,17 +32,7 @@ def loadJiraSettings(path: str, cli):
     if cli.password:
         settings["password"] = cli.password
 
-    if cli.oauth_access_token:
-        settings["oauth_access_token"] = cli.oauth_access_token
-    if cli.oauth_access_token_secret:
-        settings["oauth_access_token_secret"] = cli.oauth_access_token_secret
-    if cli.oauth_consumer_key:
-        settings["oauth_consumer_key"] = cli.oauth_consumer_key
-    if cli.oauth_private_key_pem_path:
-        settings["oauth_private_key_pem_path"] = cli.oauth_private_key_pem_path
-
-    if cli.auth:
-        settings["auth"] = cli.auth
+    settings["auth"] = cli.auth
 
     # Make sure we have all the settings we need
     if "jira_server" not in settings:
@@ -74,6 +63,10 @@ def loadJiraSettings(path: str, cli):
             logging.warning(f"There is already a credentials key in {path}")
 
     if cli.auth == "OAUTH":
+        settings["oauth_access_token"] = cli.oauth_access_token
+        settings["oauth_access_token_secret"] = cli.oauth_access_token_secret
+        settings["oauth_consumer_key"] = cli.oauth_consumer_key
+        settings["oauth_private_key_pem_path"] = cli.oauth_private_key_pem_path
         # We need all of these when auth is set to OAUTH
         logging.info(f"settings: {settings}")
         if "oauth_access_token" not in settings:
@@ -92,6 +85,12 @@ def loadJiraSettings(path: str, cli):
             raise RuntimeError(
                 "You must specify the path to a pem file containing the Oauth private key when auth is set to OAUTH"
             )
+
+    if cli.auth == "PAT":
+        if hasattr(cli, "pat_token"):
+            settings["pat_token"] = cli.pat_token
+        if "pat_token" not in settings:
+            settings["pat_token"] = input("pat_token: ")
 
     logging.debug(f"Using JIRA server: {settings['jira_server']}")
     logging.debug(f"username: {settings['username']}")
@@ -142,80 +141,21 @@ def makeIssueData(cli):
     return issue_data
 
 
-def linkIssuesHack(
-    source: str,
-    target: str,
-    link_type: str,
-    username: str,
-    password: str,
-    jira_server: str,
-):
-    """
-    Link two issues
-
-    This is a horrible hack because the jira module fails with a permission
-    error when I use its create_issue_link method, but I can use the same
-    username and password with curl against the JIRA API directly and that
-    works, so I created an issue upstream.
-
-    I'm using this requests.get hack until https://github.com/pycontribs/jira/issues/1296
-    is fixed upstream.
-
-    Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
-    """
-
-    # This is documented to work, but returns an error that we don't have
-    # link issue permission.
-
-    # logging.info(f"Creating '{link_type}' link from {source} to {target}")
-    # result = self.connection.create_issue_link(
-    #     type=link_type, inwardIssue=source, outwardIssue=target
-    # )
-
-    data = {
-        "update": {
-            "issuelinks": [
-                {
-                    "add": {
-                        "type": {
-                            "name": link_type,
-                        },
-                        "outwardIssue": {"key": target},
-                    }
-                }
-            ]
-        }
-    }
-    url = f"{jira_server}/rest/api/2/issue/{source}"
-
-    logging.debug(f"username: {username}")
-    logging.debug(f"url: {url}")
-    logging.debug(f"data: {data}")
-
-    results = requests.put(url, auth=HTTPBasicAuth(username, password), json=data)
-    logging.debug(f"status code: {results.status_code}")
-    if results.status_code >= 200 and results.status_code < 300:
-        logging.debug("Successful")
-        logging.debug(f"results: {results}")
-        status = True
-    else:
-        logging.error(f"Call failed: {results.status_code}")
-        logging.error(f"results: {results}")
-        status = False
-    return status
-
-
 class JiraTool:
     # Jira housekeeping
     def __init__(self, settings: dict):
         """
         Create a JIRA helper object
         """
+
+        self.jira_server = settings["jira_server"]
+        self.auth = settings["auth"]
+
+        # Basic AUTH
         if "username" in settings:
             self.username = settings["username"]
         if "password" in settings:
             self.password = settings["password"]
-        self.jira_server = settings["jira_server"]
 
         # Load OAUTH credentials
         if "oauth_access_token" in settings:
@@ -226,6 +166,11 @@ class JiraTool:
             self.oauth_consumer_key = settings["oauth_consumer_key"]
         if "oauth_private_key_pem_path" in settings:
             self.oauth_private_key_pem_path = settings["oauth_private_key_pem_path"]
+
+        # PAT token
+        if "pat_token" in settings:
+            self.pat_token = settings["pat_token"]
+
         self.connect(auth=settings["auth"])
 
     def __str__(self):
@@ -237,12 +182,15 @@ class JiraTool:
 
     def connect(self, auth: str = "BASIC"):
         jiraOptions = {"server": self.jira_server}
+        logging.debug(f"Connecting to {self.jira_server} using {auth} authentication.")
+
         if auth == "BASIC":
             jiraBasicAuth = (self.username, self.password)
             logging.debug(
                 f"Creating connection to {self.jira_server} with user {self.username}"
             )
             self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
+
         if auth == "OAUTH":
             with open(self.oauth_private_key_pem_path, "r") as key_cert_file:
                 key_cert_data = key_cert_file.read()
@@ -253,7 +201,16 @@ class JiraTool:
                 "consumer_key": self.oauth_consumer_key,
                 "key_cert": key_cert_data,
             }
+            logging.debug(
+                f"Creating connection to {self.jira_server} with Oauth athentication, consumer key {self.oauth_consumer_key}"
+            )
             self.connection = JIRA(options=jiraOptions, oauth=oauth_dict)
+
+        if auth == "PAT":
+            logging.debug(
+                f"Creating connection to {self.jira_server} with PAT authentication"
+            )
+            self.connection = JIRA(options=jiraOptions, token_auth=self.pat_token)
 
     # Field manipulations
 
@@ -418,6 +375,16 @@ class JiraTool:
     def linkIssues(self, source, target, link_type):
         """
         Link two issues
+
+        This is a horrible hack because the jira module fails with a permission
+        error when I use its create_issue_link method, but I can use the same
+        username and password with curl against the JIRA API directly and that
+        works, so I created an issue upstream.
+
+        I'm using this requests.get hack until https://github.com/pycontribs/jira/issues/1296
+        is fixed upstream.
+
+        Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
         """
         # Jira is inconsistent about when you can use string ticket ids and
         # when you have to use issue objects
@@ -426,15 +393,55 @@ class JiraTool:
         logging.debug(f"source_issue: {source_issue}")
         logging.debug(f"target_issue: {target_issue}")
 
-        # Link the two issues
-        return linkIssuesHack(
-            username=self.username,
-            password=self.password,
-            link_type=link_type,
-            source=source,
-            target=target,
-            jira_server=self.jira_server,
-        )
+        # This is documented to work, but returns an error that we don't have
+        # link issue permission.
+
+        # logging.info(f"Creating '{link_type}' link from {source} to {target}")
+        # result = self.connection.create_issue_link(
+        #     type=link_type, inwardIssue=source, outwardIssue=target
+        # )
+
+        # Instead, we're going to hit the REST api ourselves :-(
+
+        data = {
+            "update": {
+                "issuelinks": [
+                    {
+                        "add": {
+                            "type": {
+                                "name": link_type,
+                            },
+                            "outwardIssue": {"key": target},
+                        }
+                    }
+                ]
+            }
+        }
+        url = f"{self.jira_server}/rest/api/2/issue/{source}"
+
+        logging.debug(f"url: {url}")
+        logging.debug(f"data: {data}")
+
+        # Instead of maessing with creating our own oauth or PAT credential,
+        # extract the auth method & data out of the JIRA object created in our
+        # connect() method.
+        # Ugly, but better than trying to do it ourselves.
+        jira_auth = self.connection._session.auth
+
+        logging.debug(f"Auth: {jira_auth}")
+        results = requests.put(url, auth=jira_auth, json=data)
+
+        logging.debug(f"status code: {results.status_code}")
+
+        if results.status_code >= 200 and results.status_code < 300:
+            logging.debug("Successful")
+            logging.debug(f"results: {results}")
+            status = True
+        else:
+            logging.error(f"Call failed: {results.status_code}")
+            logging.error(f"results: {results}")
+            status = False
+        return status
 
     def listTickets(self, project: str):
         for singleIssue in self.connection.search_issues(
@@ -627,12 +634,13 @@ class JiraTool:
 
         if field_type.lower() == "menu" or field_type.lower() == "dropdown":
             # Suck abounds.
+            #
             # JIRA dropdown field value menus are an aggravating sharp edge.
             # If you have a predefined list of menu items, you can't just
             # shovel in a string that corresponds to one of those defined
             # menu items. JIRA isn't smart enough to compare that string to
             # it's list of allowed values and use it if it's a valid option.
-
+            #
             # Instead, you have to figure out what id that corresponds to, and
             # set _that_. Along with the damn original value, of course.
             if not self.customfield_mappings:
