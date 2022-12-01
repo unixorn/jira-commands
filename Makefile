@@ -11,6 +11,8 @@ t: test
 i: image
 image: local
 
+MODULE_VERSION=$(shell poetry run python3 -c 'from jira_commands import __version__;print(__version__)' )
+
 format: format_code format_tests
 
 format_code:
@@ -31,10 +33,10 @@ wheel: clean format requirements.txt
 	poetry build
 
 local: wheel
-	docker buildx build --load -t unixorn/jira-commands .
+	docker buildx build --load -t unixorn/jira-commands --build-arg application_version=${MODULE_VERSION} .
 
 fatimage: wheel
-	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands .
+	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands:${MODULE_VERSION} --build-arg application_version=${MODULE_VERSION} .
 	make local
 
 clean:
