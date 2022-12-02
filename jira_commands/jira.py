@@ -109,32 +109,33 @@ def makeIssueData(cli):
     returns dict
     """
     try:
-        if cli.json:
+        if hasattr(cli, "json"):
             issue_data = json.loads(cli.json)
             logging.debug(f"issue_data (from --json): {issue_data}")
         else:
             logging.debug("Starting with blank issue data")
             issue_data = {}
-    except AttributeError:
+    except AttributeError as missing_json:
         logging.warning("No json command line argument found")
+        raise missing_json
 
-    if cli.description:
+    if hasattr(cli, "description"):
         logging.debug(f"description: {cli.description}")
         issue_data["description"] = cli.description
 
-    if cli.issue_type:
+    if hasattr(cli, "issue_type"):
         logging.debug(f"issue_type: {cli.issue_type}")
         issue_data["issuetype"] = cli.issue_type
 
-    if cli.label:
+    if hasattr(cli, "label"):
         logging.debug(f"label: {cli.label}")
         issue_data["label"] = cli.label
 
-    if cli.project:
+    if hasattr(cli, "project"):
         logging.debug(f"project: {cli.project}")
         issue_data["project"] = cli.project
 
-    if cli.summary:
+    if hasattr(cli, "summary"):
         logging.debug(f"summary: {cli.summary}")
         issue_data["summary"] = cli.summary
 
@@ -247,6 +248,7 @@ class JiraTool:
             return issue.update(fields=fields)
         except Exception as jiraConniption:
             logging.exception(jiraConniption)
+            raise jiraConniption
 
     def updateMultipleFields(self, ticket: str, fields: dict):
         """
@@ -258,6 +260,7 @@ class JiraTool:
             return issue.update(fields=fields)
         except Exception as jiraConniption:
             logging.exception(jiraConniption)
+            raise jiraConniption
 
     # Utility functions
     def assignTicket(self, ticket: str, assignee: str):
