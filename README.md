@@ -13,6 +13,7 @@
 - [Configuration](#configuration)
   - [Basic Authentication](#basic-authentication)
   - [OAuth Authentication](#oauth-authentication)
+  - [PAT authentication](#pat-authentication)
 - [Installation](#installation)
   - [Run via docker / nerdctl](#run-via-docker--nerdctl)
   - [Direct pip install](#direct-pip-install)
@@ -56,11 +57,11 @@ The `jc` commands all read settings from `~/.jira-commands/jira.yaml`. Settings 
 
 ### Basic Authentication
 
-I'm setting my username and jira server in the example below. The tools will ask for my password when I run them.
+I'm setting my username and jira server in the example configuraation file below. The tools will ask for my password when I run them.
 
 ```yaml
 jira_server: https://jira.example.com
-username: yourusername
+username: YOUR_JIRA_USER
 ```
 
 You can specify a `password` key but it's a terrible idea.
@@ -75,7 +76,17 @@ oauth_access_token: ABCDabcdABCDabcdABCDabcdABCDabcd
 oauth_access_token_secret: ABCDabcdABCDabcdABCDabcdABCDabcd
 oauth_consumer_key: OAUTH_CONSUMER_KEY_ID
 oauth_private_key_pem_pathL: /path/to/pem/file
-username: JIRA_USER
+username: YOUR_JIRA_USER
+```
+
+### PAT authentication
+
+Here's an example settings file for PAT authentication.
+
+```yaml
+username: YOUR_JIRA_USER
+pat_token: xyzzyAbc123
+jira_server: https://jira.example.com/
 ```
 
 ## Installation
