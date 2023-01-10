@@ -581,7 +581,6 @@ class JiraTool:
                         data[opt["value"]] = opt["id"]
                         logging.debug(f"Setting data['{opt['value']}'] to {opt['id']}")
                 allowed[field] = data
-        logging.debug(f"allowed: {allowed}")
         return allowed
 
     def updateFieldDict(
