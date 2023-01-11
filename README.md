@@ -39,6 +39,7 @@ All of these scripts support `--help` to get a detailed list of command line opt
 | `jc create ticket` / `jc ticket create` | Create a ticket. You will need|
 | `jc custom field allowed values` | List a custom field's allowed values since JIRA isn't forthcoming about them. |
 | `jc examine ticket` / `jc ticket examine` | Detailed dump of a ticket and all its custom field names |
+| `jc extract customfield mappings` | Extract the custom field mappings from an issue into a file |
 | `jc get link types` | Prints the names of all link types defined on your JIRA instance. |
 | `jc get priority ids` | Prints the names of all ticket priorities defined on your JIRA instance. |
 | `jc link tickets` / `jc ticket link` | Link two tickets. Use `jc get link types` to see what link names are defined on your JIRA server. Case matters. |

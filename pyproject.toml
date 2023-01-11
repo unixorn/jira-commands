@@ -39,7 +39,10 @@ jc-create-ticket = 'jira_commands.cli.crudops:createTicket'
 jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
 
 jc-dump-all-customfield-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
+jc-dump-all-custom-field-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
 
+jc-extract-customfield-mappings = 'jira_commands.cli.map_extractor:create_mapping_file'
+jc-extract-custom-field-mappings = 'jira_commands.cli.map_extractor:create_mapping_file'
 jc-ticket-dump-metadata = 'jira_commands.cli.vivisect:dump_metadata'
 jc-ticket-metadata = 'jira_commands.cli.vivisect:dump_metadata'
 
