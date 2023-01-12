@@ -71,6 +71,9 @@ jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
 
+[tool.pyright]
+reportMissingImports = false
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
