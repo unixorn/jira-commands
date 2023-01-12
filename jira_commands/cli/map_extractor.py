@@ -43,10 +43,10 @@ def mappings_extractor_cli(
     description: str = "Extract field maps for a JIRA issue type from a golden issue",
 ):
     """
-    Parse the command line options
+    Parse command line options for the custom mapping file creator
     """
     parser = mappings_extractor_parser(
-        description="Extract field maps for a JIRA issue type from a golden issue"
+        description=description
     )
 
     cli = parser.parse_args()

@@ -12,20 +12,19 @@ from jira_commands.cli.common import baseCLIParser
 from jira_commands.jira import JiraTool, loadJiraSettings
 
 
-def parseListCLI():
+def parseListCLI(description="List JIRA tickets in a project"):
     """
     Parse the command line options
     """
-    parser = baseCLIParser(description="List JIRA tickets in a project")
-
+    parser = baseCLIParser(description=description)
     parser.add_argument("--project", "-p", type=str, default="SYSENG")
 
-    cliArgs = parser.parse_args()
-    loglevel = getattr(logging, cliArgs.log_level.upper(), None)
+    cli = parser.parse_args()
+    loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.info("Set log level to %s", cliArgs.log_level.upper())
-    return cliArgs
+    logging.info("Set log level to %s", cli.log_level.upper())
+    return cli
 
 
 def listTickets():

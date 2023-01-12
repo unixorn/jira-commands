@@ -4,7 +4,7 @@
 #
 # Author: Joe Block <jblock@zscaler.com>
 # License: Apache 2.0
-# Copyright 2022, ZScaler Inc.
+# Copyright 2022-2023, ZScaler Inc.
 
 import json
 import logging
@@ -33,11 +33,11 @@ def parseTicketAssignCLI():
     return cli
 
 
-def parseTicketCommentCLI():
+def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
     """
     Command line options for commmenting on a ticket
     """
-    parser = parseTicketCLI(description="Comment on a JIRA ticket")
+    parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--comment",
         type=str,
@@ -52,11 +52,11 @@ def parseTicketCommentCLI():
     return cli
 
 
-def parseTicketCloseCLI():
+def parseTicketCloseCLI(description="Close a JIRA ticket"):
     """
     Command line options for closing a ticket
     """
-    parser = parseTicketCLI(description="Close a JIRA ticket")
+    parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--comment",
         type=str,
@@ -70,13 +70,13 @@ def parseTicketCloseCLI():
     return cli
 
 
-def parseTicketInspectionCLI():
+def parseTicketInspectionCLI(
+    description: str = "Vivisect a JIRA ticket so we can determine which custom fields map to which data keys",
+):
     """
     Command line options for ticket inspectors
     """
-    parser = parseTicketCLI(
-        description="Vivisect a JIRA ticket so we can determine which custom fields map to which data keys"
-    )
+    parser = parseTicketCLI(description=description)
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -85,11 +85,11 @@ def parseTicketInspectionCLI():
     return cli
 
 
-def parseCreateTicketCLI():
+def parseCreateTicketCLI(description: str = "Create a JIRA ticket"):
     """
     Parse the command line options
     """
-    parser = ticketCreationParser(description="Create a JIRA ticket")
+    parser = ticketCreationParser(description=description)
     cli = parser.parse_args()
 
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -107,27 +107,27 @@ def parseCreateTicketCLI():
     return cli
 
 
-def parseGetTransitionsCLI():
+def parseGetTransitionsCLI(
+    description: str = "See all transitions available on a JIRA ticket",
+):
     """
     Parse the command line options for transition list tool
     """
-    parser = parseTicketCLI(
-        description="See all transitions available on a JIRA ticket"
-    )
+    parser = parseTicketCLI(description=description)
 
-    cliArgs = parser.parse_args()
-    loglevel = getattr(logging, cliArgs.log_level.upper(), None)
+    cli = parser.parse_args()
+    loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.debug("Set log level to %s", cliArgs.log_level.upper())
-    return cliArgs
+    logging.debug("Set log level to %s", cli.log_level.upper())
+    return cli
 
 
-def parseTicketLinkCLI():
+def parseTicketLinkCLI(description: str = "Link two JIRA tickets"):
     """
     Command line options for linking two tickets
     """
-    parser = parseTicketCLI(description="Link two JIRA tickets")
+    parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--target",
         type=str,
@@ -156,23 +156,23 @@ def parseTicketLinkCLI():
     return cli
 
 
-def parseTransitionToCLI():
+def parseTransitionToCLI(
+    description: str = "See all transitions available on a JIRA ticket",
+):
     """
     Parse the command line options for transition set tool
     """
-    parser = parseTicketCLI(
-        description="See all transitions available on a JIRA ticket"
-    )
+    parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--transition-to", help="Transition a ticket to a named state", type=str
     )
 
-    cliArgs = parser.parse_args()
-    loglevel = getattr(logging, cliArgs.log_level.upper(), None)
+    cli = parser.parse_args()
+    loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     logging.basicConfig(level=loglevel, format=logFormat)
-    logging.debug("Set log level to %s", cliArgs.log_level.upper())
-    return cliArgs
+    logging.debug("Set log level to %s", cli.log_level.upper())
+    return cli
 
 
 def assignTicket():

@@ -7,7 +7,7 @@
 # Copyright 2022, ZScaler Inc.
 
 
-def dumpObject(obj):
+def dump_object(obj):
     """
     Dump an object for debugging
     """
