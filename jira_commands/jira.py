@@ -12,7 +12,7 @@ import logging
 import requests
 
 from jira import JIRA
-from jira_commands.utils import dumpObject
+from jira_commands.utils import dump_object
 from thelogrus.yaml import readYamlFile
 
 
@@ -190,7 +190,7 @@ class JiraTool:
             logging.debug(
                 f"Creating connection to {self.jira_server} with user {self.username}"
             )
-            self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)
+            self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)  # type: ignore
 
         if auth == "OAUTH":
             with open(self.oauth_private_key_pem_path, "r") as key_cert_file:
@@ -486,13 +486,13 @@ class JiraTool:
         print()
         print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
         print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
-        print(f"ticket.fields.issuelinks dump: {dumpObject(ticket.fields.issuelinks)}")
+        print(f"ticket.fields.issuelinks dump: {dump_object(ticket.fields.issuelinks)}")
         print()
         print(f"ticket.fields: {ticket.fields}")
         print()
         print(f"dir(ticket): {dir(ticket)}")
         print()
-        print(f"ticket.fields (dump): {dumpObject(ticket.fields)}")
+        print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
 
     def getTicketDict(self, project: str):
         """
@@ -505,7 +505,7 @@ class JiraTool:
             tickets[singleIssue.key] = singleIssue
             logging.debug(f"{singleIssue.key} : {singleIssue}")
             logging.debug(f"{singleIssue.key} : fields {singleIssue.fields}")
-            logging.debug(f"dumpObj(singleIssue : {dumpObject(singleIssue)}")
+            logging.debug(f"dumpObj(singleIssue : {dump_object(singleIssue)}")
             logging.debug(" ")
         return tickets
 
@@ -581,7 +581,6 @@ class JiraTool:
                         data[opt["value"]] = opt["id"]
                         logging.debug(f"Setting data['{opt['value']}'] to {opt['id']}")
                 allowed[field] = data
-        logging.debug(f"allowed: {allowed}")
         return allowed
 
     def updateFieldDict(

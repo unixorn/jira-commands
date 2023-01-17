@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.11.0"
+version = "0.12.0"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jpb@unixorn.net>"]
 homepage = "https://github.com/unixorn/jira-commands"
@@ -39,7 +39,10 @@ jc-create-ticket = 'jira_commands.cli.crudops:createTicket'
 jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
 
 jc-dump-all-customfield-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
+jc-dump-all-custom-field-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
 
+jc-extract-customfield-mappings = 'jira_commands.cli.map_extractor:create_mapping_file'
+jc-extract-custom-field-mappings = 'jira_commands.cli.map_extractor:create_mapping_file'
 jc-ticket-dump-metadata = 'jira_commands.cli.vivisect:dump_metadata'
 jc-ticket-metadata = 'jira_commands.cli.vivisect:dump_metadata'
 
@@ -67,6 +70,9 @@ jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
+
+[tool.pyright]
+reportMissingImports = false
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

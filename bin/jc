@@ -54,12 +54,12 @@ check-for-image-update() {
   last_image_pull=$(load-lastupdate-age-from-file "$PULL_COOKIE_F")
 
   if [ "${last_image_pull}" -gt "${refresh_seconds}" ]; then
-    echo "Checking for container image updates..."
+    debug "Checking for container image updates..."
     if "$CONTAINER_TOOL" pull "$JIRA_COMMAND_IMAGE"; then
       debug "Writing timestamp to $PULL_COOKIE_F"
       date '+%s' > "$PULL_COOKIE_F"
     else
-      echo "Could not pull $JIRA_COMMAND_IMAGE with $CONTAINER_TOOL"
+      debug "Could not pull $JIRA_COMMAND_IMAGE with $CONTAINER_TOOL"
     fi
   fi
 }
@@ -91,11 +91,16 @@ done
 if [[ -r "$SETTINGS_D/container-tool" ]]; then
   # Force a specific container engine
   CONTAINER_TOOL=$(cat "$HOME/.jira-commands/container-tool")
-  echo "FORCING $CONTAINER_TOOL"
+  debug "FORCING $CONTAINER_TOOL"
 fi
 
 if [[ $CONTAINER_TOOL == 'NONE' ]]; then
   fail "Can't find a tool to run jc jira commands in a container"
 fi
+
 check-for-image-update
-exec "$CONTAINER_TOOL" run -v "${SETTINGS_D}":/config --rm -it "$JIRA_COMMAND_IMAGE" jc "$@"
+
+exec "$CONTAINER_TOOL" run \
+  -v "${SETTINGS_D}":/config \
+  -v "$(pwd)":/pwd \
+  --rm -it "$JIRA_COMMAND_IMAGE" jc "$@"

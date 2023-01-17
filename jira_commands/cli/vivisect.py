@@ -7,6 +7,7 @@
 # License: Apache 2.0
 # Copyright 2022, ZScaler Inc.
 
+import json
 import logging
 import pprint
 
@@ -25,7 +26,7 @@ def dump_all_customfield_allowed_values():
 
     jira = JiraTool(settings=settings)
     allowed_dict = jira.load_customfield_allowed_values(ticket=cli.ticket)
-    print(f"{pprint.pformat(allowed_dict, indent=2)}")
+    print(json.dumps(allowed_dict))
 
 
 def parse_dump_all_customfields_cli():
