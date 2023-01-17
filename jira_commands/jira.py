@@ -190,7 +190,7 @@ class JiraTool:
             logging.debug(
                 f"Creating connection to {self.jira_server} with user {self.username}"
             )
-            self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth) # type: ignore
+            self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)  # type: ignore
 
         if auth == "OAUTH":
             with open(self.oauth_private_key_pem_path, "r") as key_cert_file:

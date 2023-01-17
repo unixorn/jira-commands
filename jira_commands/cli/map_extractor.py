@@ -45,9 +45,7 @@ def mappings_extractor_cli(
     """
     Parse command line options for the custom mapping file creator
     """
-    parser = mappings_extractor_parser(
-        description=description
-    )
+    parser = mappings_extractor_parser(description=description)
 
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
