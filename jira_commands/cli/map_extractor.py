@@ -34,8 +34,6 @@ def mappings_extractor_parser(
         type=str,
         help="Read valid dropdowns from a ticket. JIRA occasionally renumbers the dropdowns if _any_ dropdown for an issue type is modified.",
     )
-    print("WTF!")
-    print(parser)
     return parser
 
 
