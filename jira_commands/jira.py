@@ -473,26 +473,6 @@ class JiraTool:
         issue = self.connection.issue(ticket)
         return issue
 
-    def vivisect(self, ticket_id: str):
-        """
-        Vivisect a ticket so we can figure out what attributes are visible
-        via the module's API.
-        """
-        ticket = self.getTicket(ticket=ticket_id)
-        print(f"ticket: {ticket}")
-        print("ticket transitions available:")
-        for transition in self.connection.transitions(ticket):
-            print(f"  {transition}")
-        print()
-        print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
-        print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
-        print(f"ticket.fields.issuelinks dump: {dump_object(ticket.fields.issuelinks)}")
-        print()
-        print(f"ticket.fields: {ticket.fields}")
-        print()
-        print(f"dir(ticket): {dir(ticket)}")
-        print()
-        print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
 
     def getTicketDict(self, project: str):
         """
@@ -525,6 +505,49 @@ class JiraTool:
             raise ValueError(
                 f"{ticket} does not have {state} as an available transition. Perhaps your user doesn't have privilege for that?"
             )
+
+    # debug tools
+
+    def customfield_human_names(self, ticket: str):
+        """
+        Get the human name for a customfield
+        returns: str
+        """
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+        meta = self.getIssueMetaData(ticket=ticket)
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+
+        allfields = self.connection.fields()
+        name_map = {
+            self.connection.field["name"]: self.connection.field["id"]
+            for self.connection.field in allfields
+        }
+        logging.debug(f"name_map: {name_map}")
+        return name_map
+
+    def vivisect(self, ticket_id: str):
+        """
+        Vivisect a ticket so we can figure out what attributes are visible
+        via the module's API.
+        """
+        ticket = self.getTicket(ticket=ticket_id)
+        print(f"ticket: {ticket}")
+        print("ticket transitions available:")
+        for transition in self.connection.transitions(ticket):
+            print(f"  {transition}")
+        print()
+        print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
+        print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
+        print(f"ticket.fields.issuelinks dump: {dump_object(ticket.fields.issuelinks)}")
+        print()
+        print(f"ticket.fields: {ticket.fields}")
+        print()
+        print(f"dir(ticket): {dir(ticket)}")
+        print()
+        print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
+    
 
     # Internal helpers
     def initialize_customfield_mappings(self, ticket: str):
