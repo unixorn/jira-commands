@@ -360,6 +360,16 @@ class JiraTool:
         """
         return self.connection.issue(ticket)
 
+    def get_issue_type(self, ticket: str) -> str:
+        """
+        Convenience function to get the issue type for an issue
+
+        Args:
+            ticket (str): JIRA ticket number
+        """
+        issue = self.getIssueData(ticket)
+        return issue.fields.issuetype
+
     def getIssueMetaData(self, ticket: str):
         """
         Get an issue's metadata.
