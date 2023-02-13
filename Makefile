@@ -1,5 +1,7 @@
 h: help
 
+.PHONY: all clean format help image test tests f h i t
+
 help:
 	@echo "Options:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
