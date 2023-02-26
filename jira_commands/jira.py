@@ -151,6 +151,7 @@ class JiraTool:
 
         self.jira_server = settings["jira_server"]
         self.auth = settings["auth"]
+        self.supported_authentications = ["basic", "oauth", "pat"]
 
         # Basic AUTH
         if "username" in settings:
@@ -181,18 +182,23 @@ class JiraTool:
         raw = {"username": self.username, "jira_server": self.jira_server}
         return raw.__str__()
 
-    def connect(self, auth: str = "BASIC"):
+    def connect(self, auth: str = "basic"):
         jiraOptions = {"server": self.jira_server}
         logging.debug(f"Connecting to {self.jira_server} using {auth} authentication.")
 
-        if auth == "BASIC":
+        if auth.lower() not in self.supported_authentications:
+            raise NotImplementedError(
+                f"'{auth}' is not a valid authentication type. The only valid types are {', '.join(self.supported_authentications)}"
+            )
+
+        if auth.lower() == "basic":
             jiraBasicAuth = (self.username, self.password)
             logging.debug(
                 f"Creating connection to {self.jira_server} with user {self.username}"
             )
             self.connection = JIRA(options=jiraOptions, basic_auth=jiraBasicAuth)  # type: ignore
 
-        if auth == "OAUTH":
+        if auth.lower() == "oauth":
             with open(self.oauth_private_key_pem_path, "r") as key_cert_file:
                 key_cert_data = key_cert_file.read()
 
@@ -207,7 +213,7 @@ class JiraTool:
             )
             self.connection = JIRA(options=jiraOptions, oauth=oauth_dict)
 
-        if auth == "PAT":
+        if auth.lower() == "pat":
             logging.debug(
                 f"Creating connection to {self.jira_server} with PAT authentication"
             )
@@ -360,6 +366,16 @@ class JiraTool:
         """
         return self.connection.issue(ticket)
 
+    def get_issue_type(self, ticket: str) -> str:
+        """
+        Convenience function to get the issue type for an issue
+
+        Args:
+            ticket (str): JIRA ticket number
+        """
+        issue = self.getIssueData(ticket)
+        return issue.fields.issuetype
+
     def getIssueMetaData(self, ticket: str):
         """
         Get an issue's metadata.
@@ -473,27 +489,6 @@ class JiraTool:
         issue = self.connection.issue(ticket)
         return issue
 
-    def vivisect(self, ticket_id: str):
-        """
-        Vivisect a ticket so we can figure out what attributes are visible
-        via the module's API.
-        """
-        ticket = self.getTicket(ticket=ticket_id)
-        print(f"ticket: {ticket}")
-        print("ticket transitions available:")
-        for transition in self.connection.transitions(ticket):
-            print(f"  {transition}")
-        print()
-        print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
-        print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
-        print(f"ticket.fields.issuelinks dump: {dump_object(ticket.fields.issuelinks)}")
-        print()
-        print(f"ticket.fields: {ticket.fields}")
-        print()
-        print(f"dir(ticket): {dir(ticket)}")
-        print()
-        print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
-
     def getTicketDict(self, project: str):
         """
         Get JIRA tickets in a project, return as a dict
@@ -525,6 +520,48 @@ class JiraTool:
             raise ValueError(
                 f"{ticket} does not have {state} as an available transition. Perhaps your user doesn't have privilege for that?"
             )
+
+    # debug tools
+
+    def customfield_human_names(self, ticket: str):
+        """
+        Get the human name for a customfield
+        returns: str
+        """
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+        meta = self.getIssueMetaData(ticket=ticket)
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+
+        allfields = self.connection.fields()
+        name_map = {
+            self.connection.field["name"]: self.connection.field["id"]
+            for self.connection.field in allfields
+        }
+        logging.debug(f"name_map: {name_map}")
+        return name_map
+
+    def vivisect(self, ticket_id: str):
+        """
+        Vivisect a ticket so we can figure out what attributes are visible
+        via the module's API.
+        """
+        ticket = self.getTicket(ticket=ticket_id)
+        print(f"ticket: {ticket}")
+        print("ticket transitions available:")
+        for transition in self.connection.transitions(ticket):
+            print(f"  {transition}")
+        print()
+        print(f"ticket.fields.issuetype: {ticket.fields.issuetype}")
+        print(f"ticket.fields.issuelinks: {ticket.fields.issuelinks}")
+        print(f"ticket.fields.issuelinks dump: {dump_object(ticket.fields.issuelinks)}")
+        print()
+        print(f"ticket.fields: {ticket.fields}")
+        print()
+        print(f"dir(ticket): {dir(ticket)}")
+        print()
+        print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
 
     # Internal helpers
     def initialize_customfield_mappings(self, ticket: str):
