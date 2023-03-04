@@ -10,6 +10,9 @@
 def dump_object(obj):
     """
     Dump an object for debugging
+
+    Args:
+        obj: a python object to dump
     """
     for attr in dir(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
