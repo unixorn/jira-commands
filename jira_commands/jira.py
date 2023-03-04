@@ -2,7 +2,7 @@
 #
 # Author: Joe Block <jblock@zscaler.com>
 # License: Apache 2.0
-# Copyright 2022, ZScaler Inc.
+# Copyright 2022-2023, ZScaler Inc.
 #
 # Interact with JIRA
 
@@ -19,6 +19,13 @@ from thelogrus.yaml import readYamlFile
 def loadJiraSettings(path: str, cli):
     """
     Load JIRA settings from a yaml file, allowing overrides from the CLI
+
+    Args:
+        path: Path to configuration file
+        cli (argparse cli object): Command line options
+
+    Returns:
+        dict: A dictionary containing all of our settings
     """
     settings = readYamlFile(path=path)
 
@@ -106,7 +113,11 @@ def makeIssueData(cli):
     custom fields, it should get it's own issueData function that starts
     by calling this.
 
-    returns dict
+    Args:
+        cli (argparse cli): Command line arguments
+
+    Returns:
+        dict: A dictionary containing data fields to be used to create a JIRA issue.
     """
     try:
         if hasattr(cli, "json"):
@@ -146,7 +157,15 @@ class JiraTool:
     # Jira housekeeping
     def __init__(self, settings: dict):
         """
-        Create a JIRA helper object
+        Create a JIRA helper object.
+
+        This wraps an upstream JIRA object with helper methods and breakfixes
+        to make it less painful to use.
+
+        It's still painful, just less so that using the upstream module.
+
+        Args:
+            settings: All settings required to connect to JIRA.
         """
 
         self.jira_server = settings["jira_server"]
@@ -183,6 +202,13 @@ class JiraTool:
         return raw.__str__()
 
     def connect(self, auth: str = "basic"):
+        """
+        Connects to JIRA and stores the connection object as a property.
+        Reads required data from the JiraTool object's properties.
+
+        Args:
+            auth: What type of authentication to use to connect to JIRA. Allowed options are ["basic", "oauth", "pat"]
+        """
         jiraOptions = {"server": self.jira_server}
         logging.debug(f"Connecting to {self.jira_server} using {auth} authentication.")
 
@@ -227,6 +253,13 @@ class JiraTool:
 
         JIRA isn't very forgiving about ticket values, so provide a way to
         extract what it's expecting to find in a given custom field.
+
+        Args:
+            ticket: The ticket to load values from.
+            custom_field: Which custom field to determine valid values for.
+
+        Returns:
+            dict: A dictionary containing all the allowed values for field custom_field.
         """
         logging.debug(f"connection: {self.connection}")
 
@@ -239,7 +272,21 @@ class JiraTool:
 
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
         """
-        Update a field on an issue
+        Update a field on an issue.
+
+        Args:
+            ticket: Which ticket to update.
+            custom_field: Which field to alter
+            field_type: JIRA's API is too janky to figure this out
+                for itself, even though it knows what the field type is,
+                so we have to specify it.
+            value (varies): Varies based on field_type.
+
+        Returns:
+            Update results
+
+        Raises:
+            Re-raises any exceptions from underlying JIRA object during update
         """
         try:
             issue = self.getTicket(ticket=ticket)
@@ -259,6 +306,13 @@ class JiraTool:
     def updateMultipleFields(self, ticket: str, fields: dict):
         """
         Update multiple fields from a fields dictionary
+
+        Args:
+            ticket: Which ticket to update
+            fields: A dictionary with keys for each field we need to update
+
+        Raises:
+            Re-raises any exceptions from underlying JIRA object during update
         """
         try:
             issue = self.getTicket(ticket=ticket)
@@ -272,6 +326,13 @@ class JiraTool:
     def assignTicket(self, ticket: str, assignee: str):
         """
         Assign a ticket
+
+        Args:
+            ticket: What ticket to assign
+            assignee: Who to assign it to
+
+        Returns:
+            Update results
         """
         logging.debug(f"Assigning {ticket} to {assignee}")
         return self.connection.assign_issue(ticket, assignee)
@@ -279,13 +340,26 @@ class JiraTool:
     def unassignTicket(self, ticket: str):
         """
         Assign a ticket to no one
+
+        Args:
+            ticket: Which ticket to remove the assignee from
+
+        Returns:
+            Ticket update results
         """
         logging.debug(f"Assigning {ticket} to No one")
         return self.connection.assign_issue(ticket, None)
 
     def addComment(self, ticket: str, comment: str):
         """
-        Comment on a ticket
+        Comment on a ticket.
+
+        Args:
+            ticket: Ticket to comment on
+            comment: Comment to add
+
+        Returns:
+            Ticket update results
         """
         if comment:
             logging.debug(f"Adding comment {comment} to ticket {ticket}")
@@ -297,11 +371,21 @@ class JiraTool:
         self,
         issue_data: dict,
         priority: str = None,
-        strict=True,
+        strict: bool = True,
         required_fields: list = None,
     ):
         """
-        Create a JIRA ticket from a data dictionary
+        Creates a JIRA ticket from a data dictionary.
+
+        Args:
+            issue_data: dictionary with keys for every field we want
+            to set during ticket creation.
+            priority: What priority to assign the new ticket
+            required_fields: What fields to ensure are set during creation
+            strict: Enforce the required_fields
+
+        Returns:
+            Newly created issue
         """
         logging.debug(f"Creating ticket using {issue_data}")
         # Make sure we have a minimum set of fields
@@ -339,7 +423,18 @@ class JiraTool:
         strict: bool = True,
     ):
         """
-        Create a subtask
+        Create a subtask.
+
+        Creates a subtask on an existing ticket.
+
+        Args:
+            issue_data: Field data for the new subtask.
+            parent: Ticket to add a subtask to.
+            required_fields: List of fields to enforce in the subtask if strict is set.
+            strict: Whether or not to enforce the field list. Defaults to True.
+
+        Returns:
+            Ticket ID of new subtask
         """
         logging.debug("Creating a subtask")
         if not parent:
@@ -362,7 +457,7 @@ class JiraTool:
         server with.
 
         Args:
-            ticket (str): JIRA ticket number
+            ticket: JIRA ticket number
         """
         return self.connection.issue(ticket)
 
@@ -371,7 +466,10 @@ class JiraTool:
         Convenience function to get the issue type for an issue
 
         Args:
-            ticket (str): JIRA ticket number
+            ticket: JIRA ticket number
+
+        Returns:
+            str issue type
         """
         issue = self.getIssueData(ticket)
         return issue.fields.issuetype
@@ -385,13 +483,13 @@ class JiraTool:
         server with.
 
         Args:
-            ticket (str): JIRA ticket number
+            ticket: JIRA ticket number
         """
         issue = self.getIssueData(ticket=ticket)
         meta = self.connection.editmeta(issue)
         return meta
 
-    def linkIssues(self, source, target, link_type):
+    def linkIssues(self, source: str, target: str, link_type: str):
         """
         Link two issues
 
@@ -404,6 +502,14 @@ class JiraTool:
         is fixed upstream.
 
         Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
+
+        Args:
+            source: ticket id of source ticket
+            target: ticket id of target ticket
+            link_type: What kind of linkage (Blocks, Related, etc)
+
+        Returns:
+            bool : Whether or not the link was successfully created
         """
         # Jira is inconsistent about when you can use string ticket ids and
         # when you have to use issue objects
@@ -463,6 +569,12 @@ class JiraTool:
         return status
 
     def listTickets(self, project: str):
+        """
+        Prints all the tickets in a given project.
+
+        Args:
+            project: Which JIRA project to list
+        """
         for singleIssue in self.connection.search_issues(
             jql_str=f"project = {project}"
         ):
@@ -472,7 +584,10 @@ class JiraTool:
 
     def getPriorityDict(self):
         """
-        Returns a dictionary of all the priorities on a server and their IDs
+        Priorities can be altered by the local JIRA administrator.
+
+        Returns:
+            dictionary of all the priorities on a server and their IDs
         """
         raw_priorities = self.connection.priorities()
         priority_data = {}
@@ -485,13 +600,25 @@ class JiraTool:
     def getTicket(self, ticket: str):
         """
         Peel a ticket out of JIRA
+
+        Args:
+            ticket: Which ticket to load
+
+        Returns:
+            JIRA issue object
         """
         issue = self.connection.issue(ticket)
         return issue
 
     def getTicketDict(self, project: str):
         """
-        Get JIRA tickets in a project, return as a dict
+        Get all the JIRA tickets in a project. This is slow.
+
+        Args:
+            project: Which project to read from
+
+        Returns:
+            dict containing dictionaries for every ticket in the project, keyed by their ID.
         """
         tickets = {}
         for singleIssue in self.connection.search_issues(
@@ -506,7 +633,25 @@ class JiraTool:
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):
         """
-        Transition a ticket to a new state
+        Transition a ticket to a new state.
+
+        This is dangerous because the API doesn't enforce any transition
+        constraints in the project's workflows.
+
+        Sometimes workflows get can have states that can't be transitioned out
+        of, so it's nice to have this available to pry tickets out of the
+        dead-end states.
+
+        Args:
+            ticket: Which ticket to transition.
+            state: What state to transition ticket to.
+            comment: What comment to add to the ticket during transition.
+
+        Raises:
+            ValueError if state is not an available transition for ticket
+
+        Returns:
+            Result of the attempted ticket transition
         """
         issue = self.connection.issue(ticket)
         available_transitions = self.ticketTransitions(ticket=ticket)
@@ -525,8 +670,22 @@ class JiraTool:
 
     def customfield_human_names(self, ticket: str):
         """
-        Get the human name for a customfield
-        returns: str
+        Get the human names for a ticket's custom fields.
+
+        JIRA's API won't let you get the custom field data from an issue
+        type because that would be too logical. Instead, you have to read
+        them from an existing ticket of the type, which encourages people
+        to keep golden tickets lying around.
+
+        Instead of winning a trip to Wonka's factory, all you get for a
+        golden ticket is more aggravation from JIRA when someone inevitably
+        deletes them.
+
+        Args:
+            ticket: which ticket to load custom field data from
+
+        Returns:
+            dict containing customfield -> human name mappings
         """
         issue = self.getIssueData(ticket)
         logging.debug(f"issue: {issue}")
@@ -546,6 +705,9 @@ class JiraTool:
         """
         Vivisect a ticket so we can figure out what attributes are visible
         via the module's API.
+
+        Args:
+            ticket_id: Which ticket to vivisect
         """
         ticket = self.getTicket(ticket=ticket_id)
         print(f"ticket: {ticket}")
@@ -568,15 +730,58 @@ class JiraTool:
         """
         Load all the customfield value mappings and stuff them into the JIRA
         object's self.customfield_mappings property.
+
+        With a well engineered API, you wouldn't have to do this. You'd
+        assign a value to a field, and if it wasn't an allowed value, the
+        server would return an error.
+
+        JIRA's API on the other hand, is a dumpster fire and forces the user
+        to care about internal implementation details.
+
+        If a custom field is constrained to a list of values - let's use issue
+        severity as an example, you first have to load JIRA's value mappings
+        to integer ids. And those integers aren't even necessarily sequential.
+
+        For example, here's a custom field where we might store dumpster color.
+
+        "customfield_867": {
+            "1 - grey": "5309",
+            "2 - green": "16243",
+            "3 - blue": "337",
+            "4 - rust": "10967",
+        }
+
+        It's more stupid than it appears at first glance - those values can
+        _change_ if you add or edit those values, which leads me to believe
+        they're row numbers in a table somewhere - not even unique ids, just
+        the row number.
+
+        But wait, it's even more stupid than that - they can change if you edit
+        _other_ custom fields in that issue type. No, really.
+
+        Args:
+            ticket: What ticket to load the value map from
+        Returns:
+            dictionary with one dictionary for each custom field with its allowed
+            values and their IDs.
         """
         logging.info(f"Loading customfield id mappings from {ticket}...")
         self.customfield_mappings = self.load_customfield_allowed_values(ticket=ticket)
 
     def ticketTransitions(self, ticket: str):
         """
-        Find the available transitions for a given ticket
-        """
+        Find the available transitions for a given ticket.
 
+        JIRA won't let you read these from an issue type, only an existing
+        ticket.
+
+        Args:
+            ticket: Which ticket to scrape the transitions from
+
+        Returns:
+            dictionary keyed by transition name where the values are
+            transition ids.
+        """
         # Map the names to ids so the caller can use a human-understandable
         # name instead of having to track down the id.
         transitions = {}
@@ -593,7 +798,13 @@ class JiraTool:
         JIRA isn't very forgiving about ticket values, so provide a way to
         extract what it's expecting to find in a given custom field.
 
-        We need this when setting menu type custom fields
+        We need this when setting menu type custom fields.
+
+        Args:
+            ticket: which ticket to scrape for values
+
+        Returns:
+            dictionary of allowed values.
         """
         logging.debug(f"connection: {self.connection}")
 
@@ -633,7 +844,17 @@ class JiraTool:
         custom field & value specified. We create a blank fields dictionary if
         one is not provided.
 
-        Returns a dictionary.
+        Args:
+            custom_field: Which custom field to set
+            field_type: What type is the field? JIRA makes us update them
+                differently
+            fields: An optional dictionary containing fields we've already set
+            value: What value to assign to custom_field
+            child_data: Some JIRA custom field types require two values, not
+                just one.
+
+        Returns:
+            dictionary of field data
         """
         if not fields:
             fields = {}
