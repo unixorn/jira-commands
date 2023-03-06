@@ -8,6 +8,7 @@ repository = "https://github.com/unixorn/jira-commands"
 readme = 'README.md'
 
 [tool.poetry.dependencies]
+# python = "^3.9"
 python = ">=3.10,<4.0.0"
 jira = "^3.1.1"
 PyYAML = "^6.0"
@@ -70,9 +71,15 @@ jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.254"
+
 [tool.pyright]
 reportMissingImports = false
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
