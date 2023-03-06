@@ -1,0 +1,15 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: local
+    hooks:
+      - id: format-with-black
+        name: Format files with black
+        language: script
+        entry: ./hooks/scripts/format-python-files-with-black
+
+      - id: clean-up-pyc-and-pyo-files
+        name: Scrub all .pyc and .pyo files before committing
+        language: script
+        entry: ./hooks/scripts/clean-up-pyc-and-pyo-files
+
