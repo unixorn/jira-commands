@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # Vivisect a jira ticket so we can figure out the data structure and custom
 # fields for a specific ticket type.

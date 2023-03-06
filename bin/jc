@@ -78,7 +78,7 @@ debug "PULL_INTERVAL_IN_DAYS: $PULL_INTERVAL_IN_DAYS"
 debug "SETTINGS_D: $SETTINGS_D"
 
 # List in descending preference order so we use `nerdctl` instead of `docker`
-# when both are present - we prefer to use `nerdctl` because on my 
+# when both are present - we prefer to use `nerdctl` because on my
 # M1 MacBook Pro, it runs 30% faster than `docker` does.
 for tool in docker nerdctl
 do

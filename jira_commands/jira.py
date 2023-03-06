@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # Author: Joe Block <jblock@zscaler.com>
 # License: Apache 2.0

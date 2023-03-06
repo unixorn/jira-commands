@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # interact with jira
 #
@@ -42,7 +41,8 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
         "--comment",
         type=str,
         required=True,
-        help="Comment to add to the specified ticket, It only supports very limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        help="Comment to add to the specified ticket, It only supports very "
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -60,7 +60,8 @@ def parseTicketCloseCLI(description="Close a JIRA ticket"):
     parser.add_argument(
         "--comment",
         type=str,
-        help="Comment to add to the specified ticket, It only supports very limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        help="Comment to add to the specified ticket, It only supports very "
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -71,7 +72,8 @@ def parseTicketCloseCLI(description="Close a JIRA ticket"):
 
 
 def parseTicketInspectionCLI(
-    description: str = "Vivisect a JIRA ticket so we can determine which custom fields map to which data keys",
+    description: str = "Vivisect a JIRA ticket so we can determine which "
+    "custom fields map to which data keys",
 ):
     """
     Command line options for ticket inspectors

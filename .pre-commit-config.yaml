@@ -13,3 +13,21 @@ repos:
         language: script
         entry: ./hooks/scripts/clean-up-pyc-and-pyo-files
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: 'v0.0.254'
+    hooks:
+      - id: ruff
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace

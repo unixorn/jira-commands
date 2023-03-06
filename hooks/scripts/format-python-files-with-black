@@ -4,10 +4,4 @@
 
 set -o pipefail
 
-pydirs=()
-for i in $(find . -iname '*.py' -exec dirname '{}' ';' | sort | uniq)
-do
-  pydirs+=($i)
-done 
-
-black "${pydirs[@]}"
+exec black .

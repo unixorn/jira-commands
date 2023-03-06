@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # Extract the mappings from an issue to use in ticket creation
 #
@@ -32,7 +31,8 @@ def mappings_extractor_parser(
         "--template-ticket",
         "--get-field-choices-from",
         type=str,
-        help="Read valid dropdowns from a ticket. JIRA occasionally renumbers the dropdowns if _any_ dropdown for an issue type is modified.",
+        help="Read valid dropdowns from a ticket. JIRA occasionally renumbers "
+        "the dropdowns if _any_ dropdown for an issue type is modified.",
     )
     return parser
 
