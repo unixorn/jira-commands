@@ -1,6 +1,0 @@
-[flake8]
-# E501 = Line > 80 characters.
-# E203 = Whitespace before :
-#
-ignore = E203
-max-line-length = 160
