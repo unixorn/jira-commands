@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # Extract the mappings from an issue to use in ticket creation
 #
@@ -8,6 +7,9 @@
 #
 # For extra fun, it will even renumber options in the dropdowns you
 # _didn't_ edit sometimes.
+#
+# Copyright 2022-2023 Zscaler
+# License: Apache 2.0
 
 import logging
 import re
@@ -21,6 +23,12 @@ from jira_commands.jira import JiraTool, loadJiraSettings
 def mappings_extractor_parser(
     description: str = "Extract field maps for a JIRA issue type from a golden issue",
 ):
+    """
+    Create a command line parser for our field map extractor
+
+    Args:
+        description: What description we want printed by --help
+    """
     parser = baseCLIParser(description=description)
     parser.add_argument(
         "--mapping-output-file",
@@ -32,7 +40,8 @@ def mappings_extractor_parser(
         "--template-ticket",
         "--get-field-choices-from",
         type=str,
-        help="Read valid dropdowns from a ticket. JIRA occasionally renumbers the dropdowns if _any_ dropdown for an issue type is modified.",
+        help="Read valid dropdowns from a ticket. JIRA occasionally renumbers "
+        "the dropdowns if _any_ dropdown for an issue type is modified.",
     )
     return parser
 
@@ -41,7 +50,14 @@ def mappings_extractor_cli(
     description: str = "Extract field maps for a JIRA issue type from a golden issue",
 ):
     """
-    Parse command line options for the custom mapping file creator
+    Parse the command line options for the custom mapping file creator and
+    set up logging.
+
+    Args:
+        description: What description we want printed by --help
+
+    Returns:
+        argparse cli object
     """
     parser = mappings_extractor_parser(description=description)
 
@@ -56,8 +72,10 @@ def mappings_extractor_cli(
 def cleanup_mappings(data: dict = None):
     """
     We only need the customfield_* keys, not the extra garbage jira returned
+
     Args:
         data: dictionary to purge irrelevant entries from
+
     Returns:
         dict with the irrelevant entries removed
     """

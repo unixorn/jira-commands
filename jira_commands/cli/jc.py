@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # Gives us a git-style main command that calls subcommands.
 #

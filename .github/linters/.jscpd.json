@@ -2,18 +2,8 @@
   "hasModules": false,
   "threshold": 0,
   "configurations": {
-    "reporters": [
-      "html",
-      "verbose"
-    ],
-    "format": [
-      "csharp",
-      "typescript",
-      "javascript",
-      "java",
-      "cpp",
-      "c"
-    ],
+    "reporters": ["html", "verbose"],
+    "format": ["csharp", "typescript", "javascript", "java", "cpp", "c"],
     "ignore": [
       "**/.github/**",
       "**/*.yml",

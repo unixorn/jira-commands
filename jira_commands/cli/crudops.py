@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # interact with jira
 #
@@ -16,7 +15,11 @@ from jira_commands.jira import JiraTool, loadJiraSettings, makeIssueData
 
 def parseTicketAssignCLI():
     """
-    Command line options for assigning a ticket
+    Parses the command line options for assigning a ticket and
+    initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description="Assign a JIRA ticket to someone")
     parser.add_argument(
@@ -35,14 +38,19 @@ def parseTicketAssignCLI():
 
 def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
     """
-    Command line options for commmenting on a ticket
+    Parse command line options for commmenting on a ticket and initializes
+    logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--comment",
         type=str,
         required=True,
-        help="Comment to add to the specified ticket, It only supports very limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        help="Comment to add to the specified ticket, It only supports very "
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -54,13 +62,17 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
 
 def parseTicketCloseCLI(description="Close a JIRA ticket"):
     """
-    Command line options for closing a ticket
+    Parses command line options for closing a ticket and initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     parser.add_argument(
         "--comment",
         type=str,
-        help="Comment to add to the specified ticket, It only supports very limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        help="Comment to add to the specified ticket, It only supports very "
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -71,10 +83,14 @@ def parseTicketCloseCLI(description="Close a JIRA ticket"):
 
 
 def parseTicketInspectionCLI(
-    description: str = "Vivisect a JIRA ticket so we can determine which custom fields map to which data keys",
+    description: str = "Vivisect a JIRA ticket so we can determine which "
+    "custom fields map to which data keys",
 ):
     """
-    Command line options for ticket inspectors
+    Parses command line options for ticket inspectors and initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     cli = parser.parse_args()

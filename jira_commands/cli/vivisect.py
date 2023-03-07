@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 #
 # Vivisect a jira ticket so we can figure out the data structure and custom
 # fields for a specific ticket type.
 #
 # Author: Joe Block <jblock@zscaler.com>
 # License: Apache 2.0
-# Copyright 2022, ZScaler Inc.
+# Copyright 2022-2023, ZScaler Inc.
 
 import json
 import logging
@@ -113,8 +112,14 @@ def parseTicketFieldCLI(description: str):
 
 
 def listAllowedFieldValues():
+    """
+    Get the allowed values for a ticket's custom fields.
+
+    JIRA won't let us do this by issue type because that would be too logical,
+    we have to examine a ticket instead.
+    """
     cli = parseTicketFieldCLI(
-        description="Get the allowed values for a ticket's custom field"
+        description="Get the allowed values for a ticket's custom fields"
     ).parse_args()
 
     loglevel = getattr(logging, cli.log_level.upper(), None)
