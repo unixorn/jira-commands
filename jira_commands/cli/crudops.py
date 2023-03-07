@@ -15,7 +15,11 @@ from jira_commands.jira import JiraTool, loadJiraSettings, makeIssueData
 
 def parseTicketAssignCLI():
     """
-    Command line options for assigning a ticket
+    Parses the command line options for assigning a ticket and
+    initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description="Assign a JIRA ticket to someone")
     parser.add_argument(
@@ -34,7 +38,11 @@ def parseTicketAssignCLI():
 
 def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
     """
-    Command line options for commmenting on a ticket
+    Parse command line options for commmenting on a ticket and initializes
+    logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     parser.add_argument(
@@ -54,7 +62,10 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
 
 def parseTicketCloseCLI(description="Close a JIRA ticket"):
     """
-    Command line options for closing a ticket
+    Parses command line options for closing a ticket and initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     parser.add_argument(
@@ -76,7 +87,10 @@ def parseTicketInspectionCLI(
     "custom fields map to which data keys",
 ):
     """
-    Command line options for ticket inspectors
+    Parses command line options for ticket inspectors and initializes logging.
+
+    Returns:
+        An argparse CLI object
     """
     parser = parseTicketCLI(description=description)
     cli = parser.parse_args()

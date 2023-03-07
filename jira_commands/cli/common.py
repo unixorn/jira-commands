@@ -13,6 +13,9 @@ from thelogrus.fileops import readableFile
 def baseCLIParser(description: str = None):
     """
     Create the base argument parser that we build on for individual scripts
+
+    Args:
+        description: What we want displayed by --help
     """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-d", "--debug", help="Enable debug mode", action="store_true")

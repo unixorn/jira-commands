@@ -3,7 +3,7 @@
 #
 # Author: Joe Block <jblock@zscaler.com>
 # License: Apache 2.0
-# Copyright 2022, ZScaler Inc.
+# Copyright 2022-2023, ZScaler Inc.
 
 import logging
 
@@ -13,7 +13,8 @@ from jira_commands.jira import JiraTool, loadJiraSettings
 
 def parseListCLI(description="List JIRA tickets in a project"):
     """
-    Parse the command line options
+    Parse the command line options for the ticket list script and
+    initialize logging.
     """
     parser = baseCLIParser(description=description)
     parser.add_argument("--project", "-p", type=str, default="SYSENG")
