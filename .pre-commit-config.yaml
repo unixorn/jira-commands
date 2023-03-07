@@ -3,11 +3,6 @@
 repos:
   - repo: local
     hooks:
-      - id: format-with-black
-        name: Format files with black
-        language: script
-        entry: ./hooks/scripts/format-python-files-with-black
-
       - id: clean-up-pyc-and-pyo-files
         name: Scrub all .pyc and .pyo files before committing
         language: script
@@ -18,6 +13,11 @@ repos:
     rev: 'v0.0.254'
     hooks:
       - id: ruff
+
+  - repo: https://github.com/psf/black
+    rev: "23.1.0"
+    hooks:
+      - id: black
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
