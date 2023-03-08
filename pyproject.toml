@@ -16,7 +16,6 @@ thelogrus = "^0.7.0"
 cryptography = ">=38.0.3,<40.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 nose = "^1.3.7"
 black = "^22.1.0"
 isort = "^5.10.1"
@@ -73,6 +72,8 @@ jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.254"
+pytest = "^7.2.2"
+flake8 = "^6.0.0"
 
 [tool.pyright]
 reportMissingImports = false
