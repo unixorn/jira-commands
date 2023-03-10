@@ -134,7 +134,7 @@ def listAllowedFieldValues():
     settings = loadJiraSettings(path=cli.settings_file, cli=cli)
     jira = JiraTool(settings=settings)
     print(f"Values for {cli.ticket}'s {cli.custom_field}:")
-    for allowed in jira.allowedValuesForField(
+    for allowed in jira.allowed_values_for_field(
         ticket=cli.ticket, custom_field=cli.custom_field
     ):
         print(f"  {pprint.pformat(allowed, indent=2)}")
