@@ -56,6 +56,31 @@ def dump_metadata():
     print(f"  {pprint.pformat(metadata, indent=2)}")
 
 
+def extract_allowed_values():
+    cli = parseTicketFieldCLI(
+        description="Get the allowed values for custom field on a ticket. "
+        " Jira's API requires it be read from a ticket, not an issue type."
+    ).parse_args()
+
+    loglevel = getattr(logging, cli.log_level.upper(), None)
+    logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(level=loglevel, format=logFormat)
+    logging.info("Set log level to %s", cli.log_level.upper())
+
+    logging.debug(f"cli: {cli}")
+    logging.debug(f"ticket: {cli.ticket}")
+    logging.debug(f"custom_field: {cli.custom_field}")
+
+    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    jira = JiraTool(settings=settings)
+
+    print(f"Values for {cli.ticket}'s {cli.custom_field}:")
+    field_allowed_values = jira.allowed_values_for_field(
+        ticket=cli.ticket, custom_field=cli.custom_field
+    )
+    print(f"  {pprint.pformat(field_allowed_values,indent=2)}")
+
+
 def parse_metadata_cli():
     """
     Parse the command line options for jc-ticket-metadata
