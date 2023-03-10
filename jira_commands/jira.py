@@ -246,7 +246,7 @@ class JiraTool:
 
     # Field manipulations
 
-    def allowedValuesForField(self, ticket: str, custom_field: str):
+    def allowed_values_for_field(self, ticket: str, custom_field: str):
         """
         Get the allowed values for a custom field on an issue
 
@@ -266,7 +266,10 @@ class JiraTool:
         logging.debug(f"issue: {issue}")
 
         meta = self.getIssueMetaData(ticket=ticket)
-        allowed = meta["fields"][custom_field]["allowedValues"]
+        raw_fields = meta["fields"][custom_field]["allowedValues"]
+        allowed = {}
+        for r in raw_fields:
+            allowed[r["value"]] = r["id"]
         return allowed
 
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
