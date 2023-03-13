@@ -73,8 +73,10 @@ def extract_allowed_values():
 
     settings = loadJiraSettings(path=cli.settings_file, cli=cli)
     jira = JiraTool(settings=settings)
+    human_names = jira.customfield_id_map(ticket=cli.ticket)
+    custom_field_name = human_names[cli.custom_field]
 
-    print(f"Values for {cli.ticket}'s {cli.custom_field}:")
+    print(f"Values for {cli.custom_field} of {cli.ticket} aka '{custom_field_name}':")
     field_allowed_values = jira.allowed_values_for_field(
         ticket=cli.ticket, custom_field=cli.custom_field
     )

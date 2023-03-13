@@ -16,7 +16,7 @@ MODULE_VERSION=$(shell poetry run python3 -c 'from jira_commands import __versio
 format: format_code format_tests ## Reformat our .py files with black
 
 format_code:
-	black jira_commands/*.py jira_commands/cli/*.py
+	black .
 
 format_tests:
 	black tests/*.py

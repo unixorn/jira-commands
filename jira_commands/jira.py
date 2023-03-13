@@ -272,6 +272,53 @@ class JiraTool:
             allowed[r["value"]] = r["id"]
         return allowed
 
+    def customfield_id_map(self, ticket: str):
+        """
+        Create a dict keyed by customfield id with the the human names for
+        a ticket's custom fields.
+
+        JIRA's API won't let you get the custom field data from an issue
+        type because that would be too logical. Instead, you have to read
+        them from an existing ticket of the type, which encourages people
+        to keep golden tickets lying around.
+
+        Instead of winning a trip to Wonka's factory, all you get for a
+        golden ticket is more aggravation from JIRA when someone inevitably
+        deletes them.
+
+        Args:
+            ticket: which ticket to load custom field data from
+
+        Returns:
+            dict containing customfield id -> human name mappings
+        """
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+        meta = self.getIssueMetaData(ticket=ticket)
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+
+        allfields = self.connection.fields()
+        name_map = {
+            self.connection.field["id"]: self.connection.field["name"]
+            for self.connection.field in allfields
+        }
+        logging.debug(f"name_map: {name_map}")
+        return name_map
+
+    def customfield_title(self, ticket: str, custom_field: str) -> str:
+        """
+        Give the human name of a custom field
+
+        Args:
+            ticket: ticket to read field data from
+            custom_field: which field
+        Returns:
+            str human readable name of the custom field
+        """
+        human_names = self.customfield_id_map(ticket=ticket)
+        return human_names[custom_field]
+
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
         """
         Update a field on an issue.
@@ -474,7 +521,7 @@ class JiraTool:
             str issue type
         """
         issue = self.getIssueData(ticket)
-        return issue.fields.issuetype
+        return issue.fields.issuetype.name
 
     def getIssueMetaData(self, ticket: str):
         """
@@ -713,6 +760,7 @@ class JiraTool:
         """
         ticket = self.getTicket(ticket=ticket_id)
         print(f"ticket: {ticket}")
+        print(f"Issue type: {ticket.fields.issuetype.name}")
         print("ticket transitions available:")
         for transition in self.connection.transitions(ticket):
             print(f"  {transition}")
