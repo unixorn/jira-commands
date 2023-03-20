@@ -72,7 +72,7 @@ jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.0.254"
+ruff = ">=0.0.254,<0.0.258"
 pytest = "^7.2.2"
 flake8 = "^6.0.0"
 
