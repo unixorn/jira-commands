@@ -782,10 +782,15 @@ class JiraTool:
         print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
 
     # Internal helpers
-    def initialize_customfield_mappings(self, ticket: str):
+    def set_template_ticket(self, ticket: str = ""):
         """
-        Load all the customfield value mappings and stuff them into the JIRA
-        object's self.customfield_mappings property.
+        If a custom field only allows specific values, JIRA won't let us read
+        those allowed values for a custom field from an issue type, only from
+        an actual issue.
+
+        If we want to assign values then, we need to know what issue to read
+        the allowed list from, and it's less painful to assign that to the
+        JIRA object than constantly pass a ticket argument around.
 
         With a well engineered API, you wouldn't have to do this. You'd
         assign a value to a field, and if it wasn't an allowed value, the
@@ -816,13 +821,9 @@ class JiraTool:
         _other_ custom fields in that issue type. No, really.
 
         Args:
-            ticket: What ticket to load the value map from
-        Returns:
-            dictionary with one dictionary for each custom field with its allowed
-            values and their IDs.
+            ticket: Which ticket to read template values from.
         """
-        logging.info(f"Loading customfield id mappings from {ticket}...")
-        self.customfield_mappings = self.load_customfield_allowed_values(ticket=ticket)
+        self.template_ticket = ticket
 
     def ticketTransitions(self, ticket: str):
         """
@@ -888,6 +889,59 @@ class JiraTool:
                         logging.debug(f"Setting data['{opt['value']}'] to {opt['id']}")
                 allowed[field] = data
         return allowed
+
+    def _create_choice_field_entry(
+        self, custom_field: str, value: str, ticket: str = ""
+    ) -> dict:
+        """
+        Create a field entry for a choice field. We break this out so we
+        can use it in both single field update calls and when we're updating
+        multiple fields at once to minimize JIRA notifications
+
+        Args:
+            ticket: ticket to update
+            custom_field: field to update
+            value: value to assign
+
+        Returns:
+            dict with field data
+        """
+        if not ticket:
+            ticket = self.template_ticket
+        logging.debug(f"loading id map for {custom_field}...")
+        value_mapping = self.allowed_values_for_field(
+            ticket=ticket, custom_field=custom_field
+        )
+        entry = {"id": value_mapping[value], "value": value}
+        logging.debug(f"entry: {entry}")
+        return entry
+
+    def _update_choice_field(self, custom_field: str, value: str, ticket: str) -> None:
+        """
+        Update a choice-style field
+
+        Args:
+            ticket: ticket to update
+            custom_field: field to update
+            value: value to assign
+
+        Returns:
+            update results
+        """
+        try:
+            issue = self.getTicket(ticket=ticket)
+            logging.debug("Updating issue: %s", issue)
+            logging.debug(
+                f"Updating choice data, setting '{custom_field}' to '{value}'"
+            )
+            entry = self._create_choice_field_entry(
+                ticket=ticket, custom_field=custom_field, value=value
+            )
+            fields = {custom_field: entry}
+            logging.critical("Updating using %s", fields)
+            return issue.update(fields=fields)
+        except Exception as jiraConniption:
+            logging.exception(jiraConniption)
 
     def updateFieldDict(
         self,
@@ -961,12 +1015,10 @@ class JiraTool:
             #
             # Instead, you have to figure out what id that corresponds to, and
             # set _that_. Along with the damn original value, of course.
-            if not self.customfield_mappings:
-                raise RuntimeError(
-                    "Tried to set a menu field before loading field mappings"
-                )
-            choice_id = self.customfield_mappings[custom_field][value]
-            fields[custom_field] = {"value": value, "id": choice_id}
+            entry = self._create_choice_field_entry(
+                ticket=self.template_ticket, custom_field=custom_field, value=value
+            )
+            fields[custom_field] = entry
 
         if field_type.lower() == "parent":
             fields[custom_field] = {
