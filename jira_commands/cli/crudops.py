@@ -10,7 +10,7 @@ import logging
 import sys
 
 from jira_commands.cli.common import baseCLIParser, parseTicketCLI, ticketCreationParser
-from jira_commands.jira import JiraTool, loadJiraSettings, makeIssueData
+from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
 
 
 def parseTicketAssignCLI():
@@ -198,7 +198,7 @@ def assignTicket():
     cli = parseTicketAssignCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     if cli.assignee.lower() == "none":
@@ -214,7 +214,7 @@ def commentOnTicket():
     cli = parseTicketCommentCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     jira.addComment(ticket=cli.ticket, comment=cli.comment)
@@ -227,7 +227,7 @@ def closeTicket():
     cli = parseTicketCommentCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     jira.transitionTicket(ticket=cli.ticket, state="Done", comment=cli.comment)
@@ -240,8 +240,8 @@ def createTicket():
     cli = parseCreateTicketCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
-    issue_data = makeIssueData(cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
+    issue_data = make_issue_data(cli=cli)
 
     jira = JiraTool(settings=settings)
     if cli.issue_type == "Sub-task":
@@ -267,7 +267,7 @@ def getLinkTypes():
     logging.basicConfig(level=loglevel, format=logFormat)
     logging.debug("Set log level to %s", cli.log_level.upper())
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
 
@@ -288,7 +288,7 @@ def linkTickets():
     cli = parseTicketLinkCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     results = jira.linkIssues(
@@ -319,7 +319,7 @@ def getPriorities():
     logging.basicConfig(level=loglevel, format=logFormat)
     logging.debug("Set log level to %s", cli.log_level.upper())
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     priority_data = jira.getPriorityDict()
@@ -337,7 +337,7 @@ def getTransitions():
     cli = parseGetTransitionsCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     print(jira.ticketTransitions(ticket=cli.ticket))
@@ -350,7 +350,7 @@ def transitionTo():
     cli = parseTransitionToCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     print(jira.transitionTicket(ticket=cli.ticket, state=cli.transition_to))

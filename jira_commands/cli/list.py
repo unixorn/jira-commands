@@ -8,7 +8,7 @@
 import logging
 
 from jira_commands.cli.common import baseCLIParser
-from jira_commands.jira import JiraTool, loadJiraSettings
+from jira_commands.jira import JiraTool, load_jira_settings
 
 
 def parseListCLI(description="List JIRA tickets in a project"):
@@ -34,7 +34,7 @@ def listTickets():
     cli = parseListCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     jira.listTickets(project="SYSENG")

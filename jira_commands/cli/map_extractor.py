@@ -17,7 +17,7 @@ import re
 from thelogrus.yaml import writeYamlFile
 
 from jira_commands.cli.common import baseCLIParser
-from jira_commands.jira import JiraTool, loadJiraSettings
+from jira_commands.jira import JiraTool, load_jira_settings
 
 
 def mappings_extractor_parser(
@@ -98,7 +98,7 @@ def create_mapping_file():
     """
     cli = mappings_extractor_cli()
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
     logging.debug(f"settings: {settings}")
 
     jira = JiraTool(settings=settings)

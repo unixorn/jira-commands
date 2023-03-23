@@ -17,6 +17,11 @@ from thelogrus.yaml import readYamlFile
 
 
 def loadJiraSettings(path: str, cli):
+    logging.warning("loadJiraSettings() is deprecated, use load_jira_settings()")
+    return load_jira_settings(path=path, cli=cli)
+
+
+def load_jira_settings(path: str, cli):
     """
     Load JIRA settings from a yaml file, allowing overrides from the CLI
 
@@ -106,6 +111,11 @@ def loadJiraSettings(path: str, cli):
 
 
 def makeIssueData(cli):
+    logging.warning("makeIssueData() is deprecated, use make_issue_data()")
+    return make_issue_data(cli=cli)
+
+
+def make_issue_data(cli):
     """
     Create issue_data from command line arguments
 
@@ -325,6 +335,14 @@ class JiraTool:
         return human_names[custom_field]
 
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
+        logging.warning(
+            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+        )
+        return self.update_field(
+            ticket=ticket, custom_field=custom_field, value=value, field_type=field_type
+        )
+
+    def update_field(self, ticket: str, custom_field: str, value, field_type: str):
         """
         Update a field on an issue.
 
@@ -358,6 +376,12 @@ class JiraTool:
             raise jiraConniption
 
     def updateMultipleFields(self, ticket: str, fields: dict):
+        logging.warning(
+            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+        )
+        return self.update_multiple_fields(ticket=ticket, fields=fields)
+
+    def update_multiple_fields(self, ticket: str, fields: dict):
         """
         Update multiple fields from a fields dictionary
 
@@ -378,6 +402,12 @@ class JiraTool:
 
     # Utility functions
     def assignTicket(self, ticket: str, assignee: str):
+        logging.warning(
+            "JiraTool.assignTicket() is deprecated, use JiraTool.assign_ticket"
+        )
+        return self.assign_ticket(ticket=ticket, assignee=assignee)
+
+    def assign_ticket(self, ticket: str, assignee: str):
         """
         Assign a ticket
 
@@ -392,6 +422,12 @@ class JiraTool:
         return self.connection.assign_issue(ticket, assignee)
 
     def unassignTicket(self, ticket: str):
+        logging.warning(
+            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+        )
+        return self.unassign_ticket(ticket=ticket)
+
+    def unassign_ticket(self, ticket: str):
         """
         Assign a ticket to no one
 
@@ -405,6 +441,12 @@ class JiraTool:
         return self.connection.assign_issue(ticket, None)
 
     def addComment(self, ticket: str, comment: str):
+        logging.warning(
+            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+        )
+        return self.add_comment(ticket=ticket, comment=comment)
+
+    def add_comment(self, ticket: str, comment: str):
         """
         Comment on a ticket.
 
@@ -422,6 +464,23 @@ class JiraTool:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
     def createTicket(
+        self,
+        issue_data: dict,
+        priority: str = None,
+        strict: bool = True,
+        required_fields: list = None,
+    ):
+        logging.warning(
+            "JiraTool.createTicket() is deprecated, use JiraTool.create_ticket"
+        )
+        return self.create_ticket(
+            issue_data=issue_data,
+            priority=priority,
+            strict=strict,
+            required_fields=required_fields,
+        )
+
+    def create_ticket(
         self,
         issue_data: dict,
         priority: str = None,
@@ -476,6 +535,23 @@ class JiraTool:
         required_fields: list = None,
         strict: bool = True,
     ):
+        logging.warning(
+            "JiraTool.createSubtask() is deprecated, use JiraTool.create_subtask"
+        )
+        return self.create_subtask(
+            issue_data=issue_data,
+            parent=parent,
+            required_fields=required_fields,
+            strict=strict,
+        )
+
+    def create_subtask(
+        self,
+        issue_data: dict,
+        parent: str,
+        required_fields: list = None,
+        strict: bool = True,
+    ):
         """
         Create a subtask.
 
@@ -503,6 +579,12 @@ class JiraTool:
         )
 
     def getIssueData(self, ticket: str):
+        logging.warning(
+            "JiraTool.getIssueData() is deprecated, use JiraTool.get_issue_data()"
+        )
+        return self.get_issue_data(ticket=ticket)
+
+    def get_issue_data(self, ticket: str):
         """
         Returns the JIRA issue data for a ticket
 
@@ -529,6 +611,12 @@ class JiraTool:
         return issue.fields.issuetype.name
 
     def getIssueMetaData(self, ticket: str):
+        logging.warning(
+            "JiraTool.getIssueMetaData() is deprecated, use JiraTool.get_issue_metadata()"
+        )
+        return self.get_issue_metadata(ticket=ticket)
+
+    def get_issue_metadata(self, ticket: str):
         """
         Get an issue's metadata.
 
@@ -544,6 +632,12 @@ class JiraTool:
         return meta
 
     def linkIssues(self, source: str, target: str, link_type: str):
+        logging.warning(
+            "JiraTool.linkIssues() is deprecated, use JiraTool.link_issues()"
+        )
+        return self.link_issues(source=source, target=target, link_type=link_type)
+
+    def link_issues(self, source: str, target: str, link_type: str):
         """
         Link two issues
 
@@ -623,6 +717,12 @@ class JiraTool:
         return status
 
     def listTickets(self, project: str):
+        logging.warning(
+            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+        )
+        return self.list_tickets(project=project)
+
+    def list_tickets(self, project: str):
         """
         Prints all the tickets in a given project.
 
@@ -637,6 +737,12 @@ class JiraTool:
             )
 
     def getPriorityDict(self):
+        logging.warning(
+            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+        )
+        return self.get_priority_dict()
+
+    def get_priority_dict(self):
         """
         Priorities can be altered by the local JIRA administrator.
 
@@ -652,6 +758,10 @@ class JiraTool:
         return priority_data
 
     def getTicket(self, ticket: str):
+        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        return self.get_ticket(ticket=ticket)
+
+    def get_ticket(self, ticket: str):
         """
         Peel a ticket out of JIRA
 
@@ -665,6 +775,12 @@ class JiraTool:
         return issue
 
     def getTicketDict(self, project: str):
+        logging.warning(
+            "JiraTool.getTicketDict() is deprecated, use JiraTool.get_ticket_dict()"
+        )
+        return self.get_ticket_dict(project=project)
+
+    def get_ticket_dict(self, project: str):
         """
         Get all the JIRA tickets in a project. This is slow.
 
@@ -686,6 +802,10 @@ class JiraTool:
         return tickets
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):
+        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        return self.transition_ticket(ticket=ticket, state=state)
+
+    def transition_ticket(self, ticket: str, state: str, comment: str = None):
         """
         Transition a ticket to a new state.
 
@@ -826,6 +946,12 @@ class JiraTool:
         self.template_ticket = ticket
 
     def ticketTransitions(self, ticket: str):
+        logging.warning(
+            "JiraTool.ticketTransitions() is deprecated, use JiraTool.ticket_transitions()"
+        )
+        return self.ticket_transitions(ticket=ticket)
+
+    def ticket_transitions(self, ticket: str):
         """
         Find the available transitions for a given ticket.
 
@@ -944,6 +1070,25 @@ class JiraTool:
             logging.exception(jiraConniption)
 
     def updateFieldDict(
+        self,
+        custom_field: str,
+        field_type: str,
+        fields: dict = None,
+        value=None,
+        child_data=None,
+    ):
+        logging.warning(
+            "JiraTool.updateFieldDict() is deprecated, use JiraTool.update_field_dict()"
+        )
+        return self.update_field_dict(
+            custom_field=custom_field,
+            field_type=field_type,
+            fields=fields,
+            value=value,
+            child_data=child_data,
+        )
+
+    def update_field_dict(
         self,
         custom_field: str,
         field_type: str,
