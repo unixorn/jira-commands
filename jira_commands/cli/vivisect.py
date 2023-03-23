@@ -11,7 +11,7 @@ import logging
 import pprint
 
 from jira_commands.cli.common import parseTicketCLI, baseCLIParser
-from jira_commands.jira import JiraTool, loadJiraSettings
+from jira_commands.jira import JiraTool, load_jira_settings
 
 
 def dump_all_customfield_allowed_values():
@@ -21,7 +21,7 @@ def dump_all_customfield_allowed_values():
     cli = parse_dump_all_customfields_cli()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     allowed_dict = jira.load_customfield_allowed_values(ticket=cli.ticket)
@@ -49,7 +49,7 @@ def dump_metadata():
     cli = parse_metadata_cli()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     metadata = jira.getIssueMetaData(ticket=cli.ticket)
@@ -71,10 +71,12 @@ def extract_allowed_values():
     logging.debug(f"ticket: {cli.ticket}")
     logging.debug(f"custom_field: {cli.custom_field}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
     jira = JiraTool(settings=settings)
+    human_names = jira.customfield_id_map(ticket=cli.ticket)
+    custom_field_name = human_names[cli.custom_field]
 
-    print(f"Values for {cli.ticket}'s {cli.custom_field}:")
+    print(f"Values for {cli.custom_field} of {cli.ticket} aka '{custom_field_name}':")
     field_allowed_values = jira.allowed_values_for_field(
         ticket=cli.ticket, custom_field=cli.custom_field
     )
@@ -119,7 +121,7 @@ def vivisect():
     cli = parseVivisectCLI()
     logging.debug(f"cli: {cli}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
     jira.vivisect(ticket_id=cli.ticket)
@@ -156,7 +158,7 @@ def listAllowedFieldValues():
     logging.debug(f"ticket: {cli.ticket}")
     logging.debug(f"custom_field: {cli.custom_field}")
 
-    settings = loadJiraSettings(path=cli.settings_file, cli=cli)
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
     jira = JiraTool(settings=settings)
     print(f"Values for {cli.ticket}'s {cli.custom_field}:")
     for allowed in jira.allowed_values_for_field(

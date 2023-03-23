@@ -5,6 +5,7 @@
 #
 # Interact with JIRA
 
+from functools import lru_cache
 import getpass
 import json
 import logging
@@ -16,6 +17,11 @@ from thelogrus.yaml import readYamlFile
 
 
 def loadJiraSettings(path: str, cli):
+    logging.warning("loadJiraSettings() is deprecated, use load_jira_settings()")
+    return load_jira_settings(path=path, cli=cli)
+
+
+def load_jira_settings(path: str, cli):
     """
     Load JIRA settings from a yaml file, allowing overrides from the CLI
 
@@ -105,6 +111,11 @@ def loadJiraSettings(path: str, cli):
 
 
 def makeIssueData(cli):
+    logging.warning("makeIssueData() is deprecated, use make_issue_data()")
+    return make_issue_data(cli=cli)
+
+
+def make_issue_data(cli):
     """
     Create issue_data from command line arguments
 
@@ -246,6 +257,7 @@ class JiraTool:
 
     # Field manipulations
 
+    @lru_cache(maxsize=32)
     def allowed_values_for_field(self, ticket: str, custom_field: str):
         """
         Get the allowed values for a custom field on an issue
@@ -272,7 +284,65 @@ class JiraTool:
             allowed[r["value"]] = r["id"]
         return allowed
 
+    @lru_cache(maxsize=32)
+    def customfield_id_map(self, ticket: str):
+        """
+        Create a dict keyed by customfield id with the the human names for
+        a ticket's custom fields.
+
+        JIRA's API won't let you get the custom field data from an issue
+        type because that would be too logical. Instead, you have to read
+        them from an existing ticket of the type, which encourages people
+        to keep golden tickets lying around.
+
+        Instead of winning a trip to Wonka's factory, all you get for a
+        golden ticket is more aggravation from JIRA when someone inevitably
+        deletes them.
+
+        Args:
+            ticket: which ticket to load custom field data from
+
+        Returns:
+            dict containing customfield id -> human name mappings
+        """
+        issue = self.getIssueData(ticket)
+        logging.debug(f"issue: {issue}")
+        meta = self.getIssueMetaData(ticket=ticket)
+        fields = meta["fields"]
+        logging.debug(f"fields: {fields.keys()}")
+
+        allfields = self.connection.fields()
+        name_map = {
+            self.connection.field["id"]: self.connection.field["name"]
+            for self.connection.field in allfields
+        }
+        logging.debug(f"name_map: {name_map}")
+        return name_map
+
+    @lru_cache(maxsize=32)
+    def customfield_title(self, ticket: str, custom_field: str) -> str:
+        """
+        Return the human name of a custom field
+
+        Args:
+            ticket: ticket to read field data from
+            custom_field: which field
+
+        Returns:
+            str human readable name of the custom field
+        """
+        human_names = self.customfield_id_map(ticket=ticket)
+        return human_names[custom_field]
+
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
+        logging.warning(
+            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+        )
+        return self.update_field(
+            ticket=ticket, custom_field=custom_field, value=value, field_type=field_type
+        )
+
+    def update_field(self, ticket: str, custom_field: str, value, field_type: str):
         """
         Update a field on an issue.
 
@@ -306,6 +376,12 @@ class JiraTool:
             raise jiraConniption
 
     def updateMultipleFields(self, ticket: str, fields: dict):
+        logging.warning(
+            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+        )
+        return self.update_multiple_fields(ticket=ticket, fields=fields)
+
+    def update_multiple_fields(self, ticket: str, fields: dict):
         """
         Update multiple fields from a fields dictionary
 
@@ -326,6 +402,12 @@ class JiraTool:
 
     # Utility functions
     def assignTicket(self, ticket: str, assignee: str):
+        logging.warning(
+            "JiraTool.assignTicket() is deprecated, use JiraTool.assign_ticket"
+        )
+        return self.assign_ticket(ticket=ticket, assignee=assignee)
+
+    def assign_ticket(self, ticket: str, assignee: str):
         """
         Assign a ticket
 
@@ -340,6 +422,12 @@ class JiraTool:
         return self.connection.assign_issue(ticket, assignee)
 
     def unassignTicket(self, ticket: str):
+        logging.warning(
+            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+        )
+        return self.unassign_ticket(ticket=ticket)
+
+    def unassign_ticket(self, ticket: str):
         """
         Assign a ticket to no one
 
@@ -353,6 +441,12 @@ class JiraTool:
         return self.connection.assign_issue(ticket, None)
 
     def addComment(self, ticket: str, comment: str):
+        logging.warning(
+            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+        )
+        return self.add_comment(ticket=ticket, comment=comment)
+
+    def add_comment(self, ticket: str, comment: str):
         """
         Comment on a ticket.
 
@@ -370,6 +464,23 @@ class JiraTool:
             raise RuntimeError("You must specify a comment to add to the ticket")
 
     def createTicket(
+        self,
+        issue_data: dict,
+        priority: str = None,
+        strict: bool = True,
+        required_fields: list = None,
+    ):
+        logging.warning(
+            "JiraTool.createTicket() is deprecated, use JiraTool.create_ticket"
+        )
+        return self.create_ticket(
+            issue_data=issue_data,
+            priority=priority,
+            strict=strict,
+            required_fields=required_fields,
+        )
+
+    def create_ticket(
         self,
         issue_data: dict,
         priority: str = None,
@@ -424,6 +535,23 @@ class JiraTool:
         required_fields: list = None,
         strict: bool = True,
     ):
+        logging.warning(
+            "JiraTool.createSubtask() is deprecated, use JiraTool.create_subtask"
+        )
+        return self.create_subtask(
+            issue_data=issue_data,
+            parent=parent,
+            required_fields=required_fields,
+            strict=strict,
+        )
+
+    def create_subtask(
+        self,
+        issue_data: dict,
+        parent: str,
+        required_fields: list = None,
+        strict: bool = True,
+    ):
         """
         Create a subtask.
 
@@ -451,6 +579,12 @@ class JiraTool:
         )
 
     def getIssueData(self, ticket: str):
+        logging.warning(
+            "JiraTool.getIssueData() is deprecated, use JiraTool.get_issue_data()"
+        )
+        return self.get_issue_data(ticket=ticket)
+
+    def get_issue_data(self, ticket: str):
         """
         Returns the JIRA issue data for a ticket
 
@@ -474,9 +608,15 @@ class JiraTool:
             str issue type
         """
         issue = self.getIssueData(ticket)
-        return issue.fields.issuetype
+        return issue.fields.issuetype.name
 
     def getIssueMetaData(self, ticket: str):
+        logging.warning(
+            "JiraTool.getIssueMetaData() is deprecated, use JiraTool.get_issue_metadata()"
+        )
+        return self.get_issue_metadata(ticket=ticket)
+
+    def get_issue_metadata(self, ticket: str):
         """
         Get an issue's metadata.
 
@@ -492,6 +632,12 @@ class JiraTool:
         return meta
 
     def linkIssues(self, source: str, target: str, link_type: str):
+        logging.warning(
+            "JiraTool.linkIssues() is deprecated, use JiraTool.link_issues()"
+        )
+        return self.link_issues(source=source, target=target, link_type=link_type)
+
+    def link_issues(self, source: str, target: str, link_type: str):
         """
         Link two issues
 
@@ -571,6 +717,12 @@ class JiraTool:
         return status
 
     def listTickets(self, project: str):
+        logging.warning(
+            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+        )
+        return self.list_tickets(project=project)
+
+    def list_tickets(self, project: str):
         """
         Prints all the tickets in a given project.
 
@@ -585,6 +737,12 @@ class JiraTool:
             )
 
     def getPriorityDict(self):
+        logging.warning(
+            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+        )
+        return self.get_priority_dict()
+
+    def get_priority_dict(self):
         """
         Priorities can be altered by the local JIRA administrator.
 
@@ -600,6 +758,10 @@ class JiraTool:
         return priority_data
 
     def getTicket(self, ticket: str):
+        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        return self.get_ticket(ticket=ticket)
+
+    def get_ticket(self, ticket: str):
         """
         Peel a ticket out of JIRA
 
@@ -613,6 +775,12 @@ class JiraTool:
         return issue
 
     def getTicketDict(self, project: str):
+        logging.warning(
+            "JiraTool.getTicketDict() is deprecated, use JiraTool.get_ticket_dict()"
+        )
+        return self.get_ticket_dict(project=project)
+
+    def get_ticket_dict(self, project: str):
         """
         Get all the JIRA tickets in a project. This is slow.
 
@@ -634,6 +802,10 @@ class JiraTool:
         return tickets
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):
+        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        return self.transition_ticket(ticket=ticket, state=state)
+
+    def transition_ticket(self, ticket: str, state: str, comment: str = None):
         """
         Transition a ticket to a new state.
 
@@ -670,6 +842,7 @@ class JiraTool:
 
     # debug tools
 
+    @lru_cache(maxsize=16)
     def customfield_human_names(self, ticket: str):
         """
         Get the human names for a ticket's custom fields.
@@ -713,6 +886,7 @@ class JiraTool:
         """
         ticket = self.getTicket(ticket=ticket_id)
         print(f"ticket: {ticket}")
+        print(f"Issue type: {ticket.fields.issuetype.name}")
         print("ticket transitions available:")
         for transition in self.connection.transitions(ticket):
             print(f"  {transition}")
@@ -728,10 +902,15 @@ class JiraTool:
         print(f"ticket.fields (dump): {dump_object(ticket.fields)}")
 
     # Internal helpers
-    def initialize_customfield_mappings(self, ticket: str):
+    def set_template_ticket(self, ticket: str = ""):
         """
-        Load all the customfield value mappings and stuff them into the JIRA
-        object's self.customfield_mappings property.
+        If a custom field only allows specific values, JIRA won't let us read
+        those allowed values for a custom field from an issue type, only from
+        an actual issue.
+
+        If we want to assign values then, we need to know what issue to read
+        the allowed list from, and it's less painful to assign that to the
+        JIRA object than constantly pass a ticket argument around.
 
         With a well engineered API, you wouldn't have to do this. You'd
         assign a value to a field, and if it wasn't an allowed value, the
@@ -762,15 +941,17 @@ class JiraTool:
         _other_ custom fields in that issue type. No, really.
 
         Args:
-            ticket: What ticket to load the value map from
-        Returns:
-            dictionary with one dictionary for each custom field with its allowed
-            values and their IDs.
+            ticket: Which ticket to read template values from.
         """
-        logging.info(f"Loading customfield id mappings from {ticket}...")
-        self.customfield_mappings = self.load_customfield_allowed_values(ticket=ticket)
+        self.template_ticket = ticket
 
     def ticketTransitions(self, ticket: str):
+        logging.warning(
+            "JiraTool.ticketTransitions() is deprecated, use JiraTool.ticket_transitions()"
+        )
+        return self.ticket_transitions(ticket=ticket)
+
+    def ticket_transitions(self, ticket: str):
         """
         Find the available transitions for a given ticket.
 
@@ -793,6 +974,7 @@ class JiraTool:
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
 
+    @lru_cache(maxsize=16)
     def load_customfield_allowed_values(self, ticket: str):
         """
         Get the allowed values for all custom fields on a ticket
@@ -806,7 +988,8 @@ class JiraTool:
             ticket: which ticket to scrape for values
 
         Returns:
-            dictionary of allowed values.
+            dictionary of allowed values for each custom field on a ticket,
+            keyed by customfield_XXXX
         """
         logging.debug(f"connection: {self.connection}")
 
@@ -833,7 +1016,79 @@ class JiraTool:
                 allowed[field] = data
         return allowed
 
+    def _create_choice_field_entry(
+        self, custom_field: str, value: str, ticket: str = ""
+    ) -> dict:
+        """
+        Create a field entry for a choice field. We break this out so we
+        can use it in both single field update calls and when we're updating
+        multiple fields at once to minimize JIRA notifications
+
+        Args:
+            ticket: ticket to update
+            custom_field: field to update
+            value: value to assign
+
+        Returns:
+            dict with field data
+        """
+        if not ticket:
+            ticket = self.template_ticket
+        logging.debug(f"loading id map for {custom_field}...")
+        value_mapping = self.allowed_values_for_field(
+            ticket=ticket, custom_field=custom_field
+        )
+        entry = {"id": value_mapping[value], "value": value}
+        logging.debug(f"entry: {entry}")
+        return entry
+
+    def _update_choice_field(self, custom_field: str, value: str, ticket: str) -> None:
+        """
+        Update a choice-style field
+
+        Args:
+            ticket: ticket to update
+            custom_field: field to update
+            value: value to assign
+
+        Returns:
+            update results
+        """
+        try:
+            issue = self.getTicket(ticket=ticket)
+            logging.debug("Updating issue: %s", issue)
+            logging.debug(
+                f"Updating choice data, setting '{custom_field}' to '{value}'"
+            )
+            entry = self._create_choice_field_entry(
+                ticket=ticket, custom_field=custom_field, value=value
+            )
+            fields = {custom_field: entry}
+            logging.critical("Updating using %s", fields)
+            return issue.update(fields=fields)
+        except Exception as jiraConniption:
+            logging.exception(jiraConniption)
+
     def updateFieldDict(
+        self,
+        custom_field: str,
+        field_type: str,
+        fields: dict = None,
+        value=None,
+        child_data=None,
+    ):
+        logging.warning(
+            "JiraTool.updateFieldDict() is deprecated, use JiraTool.update_field_dict()"
+        )
+        return self.update_field_dict(
+            custom_field=custom_field,
+            field_type=field_type,
+            fields=fields,
+            value=value,
+            child_data=child_data,
+        )
+
+    def update_field_dict(
         self,
         custom_field: str,
         field_type: str,
@@ -905,12 +1160,10 @@ class JiraTool:
             #
             # Instead, you have to figure out what id that corresponds to, and
             # set _that_. Along with the damn original value, of course.
-            if not self.customfield_mappings:
-                raise RuntimeError(
-                    "Tried to set a menu field before loading field mappings"
-                )
-            choice_id = self.customfield_mappings[custom_field][value]
-            fields[custom_field] = {"value": value, "id": choice_id}
+            entry = self._create_choice_field_entry(
+                ticket=self.template_ticket, custom_field=custom_field, value=value
+            )
+            fields[custom_field] = entry
 
         if field_type.lower() == "parent":
             fields[custom_field] = {
