@@ -37,7 +37,7 @@ def listTickets():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    jira.listTickets(project="SYSENG")
+    jira.list_tickets(project="SYSENG")
 
 
 if __name__ == "__main__":

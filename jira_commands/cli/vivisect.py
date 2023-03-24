@@ -52,7 +52,7 @@ def dump_metadata():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    metadata = jira.getIssueMetaData(ticket=cli.ticket)
+    metadata = jira.get_issue_metadata(ticket=cli.ticket)
     print(f"  {pprint.pformat(metadata, indent=2)}")
 
 
