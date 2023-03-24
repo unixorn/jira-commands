@@ -202,9 +202,9 @@ def assignTicket():
 
     jira = JiraTool(settings=settings)
     if cli.assignee.lower() == "none":
-        jira.unassignTicket(ticket=cli.ticket)
+        jira.unassign_ticket(ticket=cli.ticket)
     else:
-        jira.assignTicket(ticket=cli.ticket, assignee=cli.assignee)
+        jira.assign_ticket(ticket=cli.ticket, assignee=cli.assignee)
 
 
 def commentOnTicket():
@@ -217,7 +217,7 @@ def commentOnTicket():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    jira.addComment(ticket=cli.ticket, comment=cli.comment)
+    jira.add_comment(ticket=cli.ticket, comment=cli.comment)
 
 
 def closeTicket():
@@ -230,7 +230,7 @@ def closeTicket():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    jira.transitionTicket(ticket=cli.ticket, state="Done", comment=cli.comment)
+    jira.transition_ticket(ticket=cli.ticket, state="Done", comment=cli.comment)
 
 
 def createTicket():
@@ -245,9 +245,9 @@ def createTicket():
 
     jira = JiraTool(settings=settings)
     if cli.issue_type == "Sub-task":
-        results = jira.createSubtask(issue_data=issue_data, parent=cli.parent)
+        results = jira.create_subtask(issue_data=issue_data, parent=cli.parent)
     else:
-        results = jira.createTicket(
+        results = jira.create_ticket(
             issue_data=issue_data, strict=False, priority=cli.priority
         )
     print(results)
@@ -291,7 +291,7 @@ def linkTickets():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    results = jira.linkIssues(
+    results = jira.link_issues(
         source=cli.ticket, target=cli.target, link_type=cli.link_type
     )
     logging.debug(results)
@@ -322,7 +322,7 @@ def getPriorities():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    priority_data = jira.getPriorityDict()
+    priority_data = jira.get_priority_dict()
 
     if cli.json:
         print(json.dumps({"priorities": priority_data}, indent=2))
@@ -340,7 +340,7 @@ def getTransitions():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    print(jira.ticketTransitions(ticket=cli.ticket))
+    print(jira.ticket_transitions(ticket=cli.ticket))
 
 
 def transitionTo():
@@ -353,7 +353,7 @@ def transitionTo():
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
 
     jira = JiraTool(settings=settings)
-    print(jira.transitionTicket(ticket=cli.ticket, state=cli.transition_to))
+    print(jira.transition_ticket(ticket=cli.ticket, state=cli.transition_to))
 
 
 if __name__ == "__main__":

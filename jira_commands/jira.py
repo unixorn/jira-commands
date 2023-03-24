@@ -274,10 +274,10 @@ class JiraTool:
         """
         logging.debug(f"connection: {self.connection}")
 
-        issue = self.getIssueData(ticket)
+        issue = self.get_issue_data(ticket)
         logging.debug(f"issue: {issue}")
 
-        meta = self.getIssueMetaData(ticket=ticket)
+        meta = self.get_issue_metadata(ticket=ticket)
         raw_fields = meta["fields"][custom_field]["allowedValues"]
         allowed = {}
         for r in raw_fields:
@@ -305,9 +305,9 @@ class JiraTool:
         Returns:
             dict containing customfield id -> human name mappings
         """
-        issue = self.getIssueData(ticket)
+        issue = self.get_issue_data(ticket)
         logging.debug(f"issue: {issue}")
-        meta = self.getIssueMetaData(ticket=ticket)
+        meta = self.get_issue_metadata(ticket=ticket)
         fields = meta["fields"]
         logging.debug(f"fields: {fields.keys()}")
 
@@ -361,10 +361,10 @@ class JiraTool:
             Re-raises any exceptions from underlying JIRA object during update
         """
         try:
-            issue = self.getTicket(ticket=ticket)
+            issue = self.get_ticket(ticket=ticket)
             logging.debug("Updating issue: %s", issue)
             fields = {}
-            fields = self.updateFieldDict(
+            fields = self.update_field_dict(
                 custom_field=custom_field,
                 value=value,
                 field_type=field_type,
@@ -393,7 +393,7 @@ class JiraTool:
             Re-raises any exceptions from underlying JIRA object during update
         """
         try:
-            issue = self.getTicket(ticket=ticket)
+            issue = self.get_ticket(ticket=ticket)
             logging.debug("Updating %s using %s", issue, fields)
             return issue.update(fields=fields)
         except Exception as jiraConniption:
@@ -520,7 +520,7 @@ class JiraTool:
                 )
         if priority:
             logging.debug(f"Setting ticket priority to {priority}")
-            priority_info = self.getPriorityDict()
+            priority_info = self.get_priority_dict()
             priority_data = {"id": priority_info[priority]}
             issue_data["priority"] = priority_data
         logging.debug(f"issue_data: {issue_data}")
@@ -574,7 +574,7 @@ class JiraTool:
             )
         issue_data["parent"] = {"id": parent}
         logging.debug(f"required_fields: {required_fields}")
-        return self.createTicket(
+        return self.create_ticket(
             issue_data=issue_data, required_fields=required_fields, strict=strict
         )
 
@@ -607,7 +607,7 @@ class JiraTool:
         Returns:
             str issue type
         """
-        issue = self.getIssueData(ticket)
+        issue = self.get_issue_data(ticket)
         return issue.fields.issuetype.name
 
     def getIssueMetaData(self, ticket: str):
@@ -627,7 +627,7 @@ class JiraTool:
         Args:
             ticket: JIRA ticket number
         """
-        issue = self.getIssueData(ticket=ticket)
+        issue = self.get_issue_data(ticket=ticket)
         meta = self.connection.editmeta(issue)
         return meta
 
@@ -738,7 +738,7 @@ class JiraTool:
 
     def getPriorityDict(self):
         logging.warning(
-            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+            "JiraTool.getPriorityDict() is deprecated, use JiraTool.get_priority_dict()"
         )
         return self.get_priority_dict()
 
@@ -828,7 +828,7 @@ class JiraTool:
             Result of the attempted ticket transition
         """
         issue = self.connection.issue(ticket)
-        available_transitions = self.ticketTransitions(ticket=ticket)
+        available_transitions = self.ticket_transitions(ticket=ticket)
 
         if state in available_transitions:
             logging.info(f"Transitioning issue {ticket} to state {state}")
@@ -862,9 +862,9 @@ class JiraTool:
         Returns:
             dict containing customfield -> human name mappings
         """
-        issue = self.getIssueData(ticket)
+        issue = self.get_issue_data(ticket)
         logging.debug(f"issue: {issue}")
-        meta = self.getIssueMetaData(ticket=ticket)
+        meta = self.get_issue_metadata(ticket=ticket)
         fields = meta["fields"]
         logging.debug(f"fields: {fields.keys()}")
 
@@ -884,7 +884,7 @@ class JiraTool:
         Args:
             ticket_id: Which ticket to vivisect
         """
-        ticket = self.getTicket(ticket=ticket_id)
+        ticket = self.get_ticket(ticket=ticket_id)
         print(f"ticket: {ticket}")
         print(f"Issue type: {ticket.fields.issuetype.name}")
         print("ticket transitions available:")
@@ -993,10 +993,10 @@ class JiraTool:
         """
         logging.debug(f"connection: {self.connection}")
 
-        issue = self.getIssueData(ticket)
+        issue = self.get_issue_data(ticket)
         logging.debug(f"issue: {issue}")
 
-        meta = self.getIssueMetaData(ticket=ticket)
+        meta = self.get_issue_metadata(ticket=ticket)
 
         allowed = {}
         fields = meta["fields"]
@@ -1055,7 +1055,7 @@ class JiraTool:
             update results
         """
         try:
-            issue = self.getTicket(ticket=ticket)
+            issue = self.get_ticket(ticket=ticket)
             logging.debug("Updating issue: %s", issue)
             logging.debug(
                 f"Updating choice data, setting '{custom_field}' to '{value}'"
