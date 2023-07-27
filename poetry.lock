@@ -430,13 +430,13 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jira"
-version = "3.5.1"
+version = "3.5.2"
 description = "Python library for interacting with JIRA via REST APIs."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jira-3.5.1-py3-none-any.whl", hash = "sha256:c142a69ca54a3d52259576cda5853b2d526760ce02332a4a9cad57a3a16d0130"},
-    {file = "jira-3.5.1.tar.gz", hash = "sha256:eb7a6c924780b80155cb3b9792d33430f4607c378c667473d6ed48178acba9dd"},
+    {file = "jira-3.5.2-py3-none-any.whl", hash = "sha256:f97716cd1e35523d04cb75b742143f1f3aaf098eb0ab61ad33e91812beb9edcc"},
+    {file = "jira-3.5.2.tar.gz", hash = "sha256:d23a0e0c62c0d6926ac37c68bc0b362065ae19106fe5c79d4ba964fad80d6cf2"},
 ]
 
 [package.dependencies]
