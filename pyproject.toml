@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.16.1"
+version = "0.16.2"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jpb@unixorn.net>"]
 homepage = "https://github.com/unixorn/jira-commands"

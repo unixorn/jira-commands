@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y apt-utils ca-certificates --no-install-recommends && \
     apt-get upgrade -y --no-install-recommends && \
     update-ca-certificates && \
-    apt-get install -y python3-pip python3-dev && \
+    apt-get install -y --no-install-recommends python3-pip python3-dev && \
     rm -fr /tmp/* /var/lib/apt/lists/*
 
 COPY dist/*.whl /data
