@@ -1,1 +1,4 @@
-__version__ = "0.16.2"
+from importlib import metadata
+
+# Read version from the package metadata
+__version__ = metadata.version(__package__)
