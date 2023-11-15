@@ -58,7 +58,7 @@ def load_jira_settings(path: str, cli):
         if "password" not in settings:
             settings["password"] = getpass.getpass("Password: ")
 
-    if cli.auth == "BASIC":
+        logging.debug("Using basic auth")
         if not settings["username"]:
             raise RuntimeError("You must specify the jira server username")
         if not settings["password"]:
@@ -75,6 +75,7 @@ def load_jira_settings(path: str, cli):
             logging.warning(f"There is already a credentials key in {path}")
 
     if cli.auth == "OAUTH":
+        logging.debug("Auth set to OAUTH")
         settings["oauth_access_token"] = cli.oauth_access_token
         settings["oauth_access_token_secret"] = cli.oauth_access_token_secret
         settings["oauth_consumer_key"] = cli.oauth_consumer_key
@@ -99,8 +100,12 @@ def load_jira_settings(path: str, cli):
             )
 
     if cli.auth == "PAT":
+        logging.debug("Auth set to PAT")
         if hasattr(cli, "pat_token"):
-            settings["pat_token"] = cli.pat_token
+            if cli.pat_token:
+                settings["pat_token"] = cli.pat_token
+            else:
+                logging.warning(f"cli pat token is None, skipping assignment")
         if "pat_token" not in settings:
             settings["pat_token"] = input("pat_token: ")
 
@@ -131,8 +136,12 @@ def make_issue_data(cli):
     """
     try:
         if hasattr(cli, "json"):
-            issue_data = json.loads(cli.json)
-            logging.debug(f"issue_data (from --json): {issue_data}")
+            if cli.json:
+                issue_data = json.loads(cli.json)
+                logging.debug(f"issue_data (from --json): {issue_data}")
+            else:
+                logging.debug("json cli argument is None")
+                issue_data = {}
         else:
             logging.debug("Starting with blank issue data")
             issue_data = {}
@@ -141,24 +150,31 @@ def make_issue_data(cli):
         raise missing_json
 
     if hasattr(cli, "description"):
-        logging.debug(f"description: {cli.description}")
-        issue_data["description"] = cli.description
+        if cli.description:
+            logging.debug(f"description: {cli.description}")
+            issue_data["description"] = cli.description
+        else:
+            issue_data["description"] = "No description set"
 
     if hasattr(cli, "issue_type"):
         logging.debug(f"issue_type: {cli.issue_type}")
         issue_data["issuetype"] = cli.issue_type
 
     if hasattr(cli, "label"):
-        logging.debug(f"label: {cli.label}")
-        issue_data["label"] = cli.label
+        if cli.label:
+            logging.debug(f"label: {cli.label}")
+            issue_data["label"] = cli.label
 
     if hasattr(cli, "project"):
         logging.debug(f"project: {cli.project}")
         issue_data["project"] = cli.project
 
     if hasattr(cli, "summary"):
-        logging.debug(f"summary: {cli.summary}")
-        issue_data["summary"] = cli.summary
+        if cli.summary:
+            logging.debug(f"summary: {cli.summary}")
+            issue_data["summary"] = cli.summary
+        else:
+            issue_data["summary"] = "No ticket summary set"
 
     return issue_data
 
