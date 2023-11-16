@@ -17,7 +17,7 @@ from thelogrus.yaml import readYamlFile
 
 
 def loadJiraSettings(path: str, cli):
-    logging.warning("loadJiraSettings() is deprecated, use load_jira_settings()")
+    logging.warning("loadJiraSettings() is deprecated and will be removed soon, use load_jira_settings()")
     return load_jira_settings(path=path, cli=cli)
 
 
@@ -116,7 +116,7 @@ def load_jira_settings(path: str, cli):
 
 
 def makeIssueData(cli):
-    logging.warning("makeIssueData() is deprecated, use make_issue_data()")
+    logging.warning("makeIssueData() is deprecated and will be removed soon, use make_issue_data()")
     return make_issue_data(cli=cli)
 
 
@@ -352,7 +352,7 @@ class JiraTool:
 
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
         logging.warning(
-            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+            "JiraTool.updateField() is deprecated and will be removed soon, use JiraTool.update_field"
         )
         return self.update_field(
             ticket=ticket, custom_field=custom_field, value=value, field_type=field_type
@@ -393,7 +393,7 @@ class JiraTool:
 
     def updateMultipleFields(self, ticket: str, fields: dict):
         logging.warning(
-            "JiraTool.updateField() is deprecated, use JiraTool.update_field"
+            "JiraTool.updateField() is deprecated and will be removed soon, use JiraTool.update_field"
         )
         return self.update_multiple_fields(ticket=ticket, fields=fields)
 
@@ -419,7 +419,7 @@ class JiraTool:
     # Utility functions
     def assignTicket(self, ticket: str, assignee: str):
         logging.warning(
-            "JiraTool.assignTicket() is deprecated, use JiraTool.assign_ticket"
+            "JiraTool.assignTicket() is deprecated and will be removed soon, use JiraTool.assign_ticket"
         )
         return self.assign_ticket(ticket=ticket, assignee=assignee)
 
@@ -439,7 +439,7 @@ class JiraTool:
 
     def unassignTicket(self, ticket: str):
         logging.warning(
-            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+            "JiraTool.unassignTicket is deprecated and will be removed soon, use JiraTool.unassign_ticket"
         )
         return self.unassign_ticket(ticket=ticket)
 
@@ -458,7 +458,7 @@ class JiraTool:
 
     def addComment(self, ticket: str, comment: str):
         logging.warning(
-            "JiraTool.unassignTicket is deprecated, use JiraTool.unassign_ticket"
+            "JiraTool.unassignTicket is deprecated and will be removed soon, use JiraTool.unassign_ticket"
         )
         return self.add_comment(ticket=ticket, comment=comment)
 
@@ -487,7 +487,7 @@ class JiraTool:
         required_fields: list = None,
     ):
         logging.warning(
-            "JiraTool.createTicket() is deprecated, use JiraTool.create_ticket"
+            "JiraTool.createTicket() is deprecated and will be removed soon, use JiraTool.create_ticket"
         )
         return self.create_ticket(
             issue_data=issue_data,
@@ -552,7 +552,7 @@ class JiraTool:
         strict: bool = True,
     ):
         logging.warning(
-            "JiraTool.createSubtask() is deprecated, use JiraTool.create_subtask"
+            "JiraTool.createSubtask() is deprecated and will be removed soon, use JiraTool.create_subtask"
         )
         return self.create_subtask(
             issue_data=issue_data,
@@ -596,7 +596,7 @@ class JiraTool:
 
     def getIssueData(self, ticket: str):
         logging.warning(
-            "JiraTool.getIssueData() is deprecated, use JiraTool.get_issue_data()"
+            "JiraTool.getIssueData() is deprecated and will be removed soon, use JiraTool.get_issue_data()"
         )
         return self.get_issue_data(ticket=ticket)
 
@@ -628,7 +628,7 @@ class JiraTool:
 
     def getIssueMetaData(self, ticket: str):
         logging.warning(
-            "JiraTool.getIssueMetaData() is deprecated, use JiraTool.get_issue_metadata()"
+            "JiraTool.getIssueMetaData() is deprecated and will be removed soon, use JiraTool.get_issue_metadata()"
         )
         return self.get_issue_metadata(ticket=ticket)
 
@@ -649,7 +649,7 @@ class JiraTool:
 
     def linkIssues(self, source: str, target: str, link_type: str):
         logging.warning(
-            "JiraTool.linkIssues() is deprecated, use JiraTool.link_issues()"
+            "JiraTool.linkIssues() is deprecated and will be removed soon, use JiraTool.link_issues()"
         )
         return self.link_issues(source=source, target=target, link_type=link_type)
 
@@ -734,7 +734,7 @@ class JiraTool:
 
     def listTickets(self, project: str):
         logging.warning(
-            "JiraTool.listTickets() is deprecated, use JiraTool.list_tickets()"
+            "JiraTool.listTickets() is deprecated and will be removed soon, use JiraTool.list_tickets()"
         )
         return self.list_tickets(project=project)
 
@@ -754,7 +754,7 @@ class JiraTool:
 
     def getPriorityDict(self):
         logging.warning(
-            "JiraTool.getPriorityDict() is deprecated, use JiraTool.get_priority_dict()"
+            "JiraTool.getPriorityDict() is deprecated and will be removed soon, use JiraTool.get_priority_dict()"
         )
         return self.get_priority_dict()
 
@@ -774,7 +774,7 @@ class JiraTool:
         return priority_data
 
     def getTicket(self, ticket: str):
-        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        logging.warning("JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()")
         return self.get_ticket(ticket=ticket)
 
     def get_ticket(self, ticket: str):
@@ -792,7 +792,7 @@ class JiraTool:
 
     def getTicketDict(self, project: str):
         logging.warning(
-            "JiraTool.getTicketDict() is deprecated, use JiraTool.get_ticket_dict()"
+            "JiraTool.getTicketDict() is deprecated and will be removed soon, use JiraTool.get_ticket_dict()"
         )
         return self.get_ticket_dict(project=project)
 
@@ -818,7 +818,7 @@ class JiraTool:
         return tickets
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):
-        logging.warning("JiraTool.getTicket() is deprecated, use JiraTool.get_ticket()")
+        logging.warning("JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()")
         return self.transition_ticket(ticket=ticket, state=state)
 
     def transition_ticket(self, ticket: str, state: str, comment: str = None):
@@ -963,7 +963,7 @@ class JiraTool:
 
     def ticketTransitions(self, ticket: str):
         logging.warning(
-            "JiraTool.ticketTransitions() is deprecated, use JiraTool.ticket_transitions()"
+            "JiraTool.ticketTransitions() is deprecated and will be removed soon, use JiraTool.ticket_transitions()"
         )
         return self.ticket_transitions(ticket=ticket)
 
@@ -1094,7 +1094,7 @@ class JiraTool:
         child_data=None,
     ):
         logging.warning(
-            "JiraTool.updateFieldDict() is deprecated, use JiraTool.update_field_dict()"
+            "JiraTool.updateFieldDict() is deprecated and will be removed soon, use JiraTool.update_field_dict()"
         )
         return self.update_field_dict(
             custom_field=custom_field,

@@ -11,6 +11,10 @@ from thelogrus.fileops import readableFile
 
 
 def baseCLIParser(description: str = None):
+    return base_cli_parser(description=description)
+
+
+def base_cli_parser(description: str = None):
     """
     Create the base argument parser that we build on for individual scripts
 
@@ -128,7 +132,7 @@ def ticketCreationParser(description: str):
     )
     parser.add_argument(
         "--priority",
-        help="Set priority for the new ticket. Use 'jc get priorites' to find a list of available ticket priorities.",
+        help="Set priority for the new ticket. Use 'jc get priorities' to find a list of available ticket priorities.",
         type=str,
     )
     parser.add_argument(
