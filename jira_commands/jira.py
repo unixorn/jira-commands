@@ -17,7 +17,9 @@ from thelogrus.yaml import readYamlFile
 
 
 def loadJiraSettings(path: str, cli):
-    logging.warning("loadJiraSettings() is deprecated and will be removed soon, use load_jira_settings()")
+    logging.warning(
+        "loadJiraSettings() is deprecated and will be removed soon, use load_jira_settings()"
+    )
     return load_jira_settings(path=path, cli=cli)
 
 
@@ -116,7 +118,9 @@ def load_jira_settings(path: str, cli):
 
 
 def makeIssueData(cli):
-    logging.warning("makeIssueData() is deprecated and will be removed soon, use make_issue_data()")
+    logging.warning(
+        "makeIssueData() is deprecated and will be removed soon, use make_issue_data()"
+    )
     return make_issue_data(cli=cli)
 
 
@@ -140,7 +144,7 @@ def make_issue_data(cli):
                 issue_data = json.loads(cli.json)
                 logging.debug(f"issue_data (from --json): {issue_data}")
             else:
-                logging.debug("json cli argument is None")
+                logging.debug("json cli argument is None, leaving it unset")
                 issue_data = {}
         else:
             logging.debug("Starting with blank issue data")
@@ -774,7 +778,9 @@ class JiraTool:
         return priority_data
 
     def getTicket(self, ticket: str):
-        logging.warning("JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()")
+        logging.warning(
+            "JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()"
+        )
         return self.get_ticket(ticket=ticket)
 
     def get_ticket(self, ticket: str):
@@ -818,7 +824,9 @@ class JiraTool:
         return tickets
 
     def transitionTicket(self, ticket: str, state: str, comment: str = None):
-        logging.warning("JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()")
+        logging.warning(
+            "JiraTool.getTicket() is deprecated and will be removed soon, use JiraTool.get_ticket()"
+        )
         return self.transition_ticket(ticket=ticket, state=state)
 
     def transition_ticket(self, ticket: str, state: str, comment: str = None):

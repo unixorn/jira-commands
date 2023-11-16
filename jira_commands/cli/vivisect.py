@@ -10,7 +10,7 @@ import json
 import logging
 import pprint
 
-from jira_commands.cli.common import parseTicketCLI, baseCLIParser
+from jira_commands.cli.common import base_cli_parser, parse_ticket_cli
 from jira_commands.jira import JiraTool, load_jira_settings
 
 
@@ -32,7 +32,7 @@ def parse_dump_all_customfields_cli():
     """
     Parse the command line options for jc-ticket-dump-all-customfields
     """
-    parser = parseTicketCLI(description="Dump a ticket's metadata")
+    parser = parse_ticket_cli(description="Dump a ticket's metadata")
 
     cliArgs = parser.parse_args()
     loglevel = getattr(logging, cliArgs.log_level.upper(), None)
@@ -57,7 +57,7 @@ def dump_metadata():
 
 
 def extract_allowed_values():
-    cli = parseTicketFieldCLI(
+    cli = parse_ticket_field_cli(
         description="Get the allowed values for custom field on a ticket. "
         " Jira's API requires it be read from a ticket, not an issue type."
     ).parse_args()
@@ -87,7 +87,7 @@ def parse_metadata_cli():
     """
     Parse the command line options for jc-ticket-metadata
     """
-    parser = parseTicketCLI(description="Dump a ticket's metadata")
+    parser = parse_ticket_cli(description="Dump a ticket's metadata")
 
     cliArgs = parser.parse_args()
     loglevel = getattr(logging, cliArgs.log_level.upper(), None)
@@ -98,10 +98,17 @@ def parse_metadata_cli():
 
 
 def parseVivisectCLI():
+    logging.warning(
+        "parseVivisectCLI is deprecated and will be removed soon. Use parse_vivisect_cli instead"
+    )
+    return parse_vivisect_cli()
+
+
+def parse_vivisect_cli():
     """
     Parse the command line options
     """
-    parser = parseTicketCLI(
+    parser = parse_ticket_cli(
         description="Vivisect a JIRA ticket so we can determine which custom fields map to which data keys"
     )
 
@@ -118,7 +125,7 @@ def vivisect():
     Vivisect a ticket so we can figure out what key names the various custom
     fields have, what transitions are available, etc.
     """
-    cli = parseVivisectCLI()
+    cli = parse_vivisect_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -128,10 +135,17 @@ def vivisect():
 
 
 def parseTicketFieldCLI(description: str):
+    logging.warning(
+        "parseTicketFieldCLI is deprecated and will be removed, use parse_ticket_field_cli instead"
+    )
+    return parse_ticket_field_cli(description=description)
+
+
+def parse_ticket_field_cli(description: str):
     """
     Parse the command line options and return the ticket id
     """
-    parser = baseCLIParser(description=description)
+    parser = base_cli_parser(description=description)
 
     parser.add_argument("--ticket", "-t", type=str, required=True)
     parser.add_argument("--custom-field", "-c", type=str, required=True)
@@ -145,7 +159,7 @@ def listAllowedFieldValues():
     JIRA won't let us do this by issue type because that would be too logical,
     we have to examine a ticket instead.
     """
-    cli = parseTicketFieldCLI(
+    cli = parse_ticket_field_cli(
         description="Get the allowed values for a ticket's custom fields"
     ).parse_args()
 

@@ -101,20 +101,28 @@ def base_cli_parser(description: str = None):
 
 
 def parseTicketCLI(description: str):
+    return parse_ticket_cli(description=description)
+
+
+def parse_ticket_cli(description: str = None):
     """
     Parse the command line options and return the ticket id
     """
-    parser = baseCLIParser(description=description)
+    parser = base_cli_parser(description=description)
 
     parser.add_argument("--ticket", "-t", type=str, required=True)
     return parser
 
 
 def ticketCreationParser(description: str):
+    return ticket_creation_parser(description=description)
+
+
+def ticket_creation_parser(description: str = None):
     """
     Create the base ticket creation parser
     """
-    parser = baseCLIParser(description="Create a JIRA ticket")
+    parser = base_cli_parser(description="Create a JIRA ticket")
 
     # Collect issue attributes
     parser.add_argument("--description", help="Ticket description", type=str)

@@ -16,7 +16,7 @@ import re
 
 from thelogrus.yaml import writeYamlFile
 
-from jira_commands.cli.common import baseCLIParser
+from jira_commands.cli.common import base_cli_parser
 from jira_commands.jira import JiraTool, load_jira_settings
 
 
@@ -29,7 +29,7 @@ def mappings_extractor_parser(
     Args:
         description: What description we want printed by --help
     """
-    parser = baseCLIParser(description=description)
+    parser = base_cli_parser(description=description)
     parser.add_argument(
         "--mapping-output-file",
         help="Where to write the extracted JIRA field mappings",
