@@ -107,7 +107,7 @@ def load_jira_settings(path: str, cli):
             if cli.pat_token:
                 settings["pat_token"] = cli.pat_token
             else:
-                logging.warning(f"cli pat token is None, skipping assignment")
+                logging.warning("cli pat token is None, skipping assignment")
         if "pat_token" not in settings:
             settings["pat_token"] = input("pat_token: ")
 
@@ -666,7 +666,7 @@ class JiraTool:
         username and password with curl against the JIRA API directly and that
         works, so I created an issue upstream.
 
-        I'm using this requests.get hack until https://github.com/pycontribs/jira/issues/1296
+        I'm using this requests.put hack until https://github.com/pycontribs/jira/issues/1296
         is fixed upstream.
 
         Based on https://confluence.atlassian.com/jirakb/how-to-use-rest-api-to-add-issue-links-in-jira-issues-939932271.html
@@ -722,7 +722,7 @@ class JiraTool:
         jira_auth = self.connection._session.auth
 
         logging.debug(f"Auth: {jira_auth}")
-        results = requests.put(url, auth=jira_auth, json=data)
+        results = requests.put(url, auth=jira_auth, json=data, timeout=30)
 
         logging.debug(f"status code: {results.status_code}")
 
