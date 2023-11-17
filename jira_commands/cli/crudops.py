@@ -9,7 +9,11 @@ import json
 import logging
 import sys
 
-from jira_commands.cli.common import baseCLIParser, parseTicketCLI, ticketCreationParser
+from jira_commands.cli.common import (
+    base_cli_parser,
+    parse_ticket_cli,
+    ticket_creation_parser,
+)
 from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
 
 
@@ -21,7 +25,7 @@ def parseTicketAssignCLI():
     Returns:
         An argparse CLI object
     """
-    parser = parseTicketCLI(description="Assign a JIRA ticket to someone")
+    parser = parse_ticket_cli(description="Assign a JIRA ticket to someone")
     parser.add_argument(
         "--assignee",
         type=str,
@@ -44,7 +48,7 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
     Returns:
         An argparse CLI object
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
     parser.add_argument(
         "--comment",
         type=str,
@@ -67,7 +71,7 @@ def parseTicketCloseCLI(description="Close a JIRA ticket"):
     Returns:
         An argparse CLI object
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
     parser.add_argument(
         "--comment",
         type=str,
@@ -92,7 +96,7 @@ def parseTicketInspectionCLI(
     Returns:
         An argparse CLI object
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -105,7 +109,7 @@ def parseCreateTicketCLI(description: str = "Create a JIRA ticket"):
     """
     Parse the command line options
     """
-    parser = ticketCreationParser(description=description)
+    parser = ticket_creation_parser(description=description)
     cli = parser.parse_args()
 
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -129,7 +133,7 @@ def parseGetTransitionsCLI(
     """
     Parse the command line options for transition list tool
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
 
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -143,7 +147,7 @@ def parseTicketLinkCLI(description: str = "Link two JIRA tickets"):
     """
     Command line options for linking two tickets
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
     parser.add_argument(
         "--target",
         type=str,
@@ -178,7 +182,7 @@ def parseTransitionToCLI(
     """
     Parse the command line options for transition set tool
     """
-    parser = parseTicketCLI(description=description)
+    parser = parse_ticket_cli(description=description)
     parser.add_argument(
         "--transition-to", help="Transition a ticket to a named state", type=str
     )
@@ -258,7 +262,7 @@ def getLinkTypes():
     """
     Get all the link types on a server
     """
-    parser = baseCLIParser()
+    parser = base_cli_parser()
     parser.add_argument("--json", help="Output in JSON format", action="store_true")
     cli = parser.parse_args()
 
@@ -308,7 +312,7 @@ def getPriorities():
     """
     Get all the priorities on a server
     """
-    parser = baseCLIParser(
+    parser = base_cli_parser(
         description="Get list of priorities on a server and their IDs"
     )
     parser.add_argument("--json", help="Output in JSON format", action="store_true")

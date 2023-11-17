@@ -7,7 +7,7 @@
 
 import logging
 
-from jira_commands.cli.common import baseCLIParser
+from jira_commands.cli.common import base_cli_parser
 from jira_commands.jira import JiraTool, load_jira_settings
 
 
@@ -16,7 +16,7 @@ def parseListCLI(description="List JIRA tickets in a project"):
     Parse the command line options for the ticket list script and
     initialize logging.
     """
-    parser = baseCLIParser(description=description)
+    parser = base_cli_parser(description=description)
     parser.add_argument("--project", "-p", type=str, default="SYSENG")
 
     cli = parser.parse_args()
