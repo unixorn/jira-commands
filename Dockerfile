@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10-slim
 ARG application_version=0.0
 LABEL maintainer="Joe Block <jblock@zscaler.com>"
 LABEL description="jira-commands tooling on a debian bullseye base"

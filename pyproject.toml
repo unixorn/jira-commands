@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.17.0"
+version = "0.18.0"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jpb@unixorn.net>"]
 homepage = "https://github.com/unixorn/jira-commands"
@@ -61,6 +61,9 @@ jc-ticket-link = 'jira_commands.cli.crudops:linkTickets'
 
 jc-list-ticket-transitions = 'jira_commands.cli.crudops:getTransitions'
 jc-ticket-transition-list = 'jira_commands.cli.crudops:getTransitions'
+jc-ticket-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
+jc-list-ticket-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
+jc-ticket-list-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
 
 jc-list-project-tickets = 'jira_commands.cli.list:listTickets'
 
