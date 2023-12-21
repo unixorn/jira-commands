@@ -153,6 +153,12 @@ def parse_ticket_field_cli(description: str):
 
 
 def listAllowedFieldValues():
+    logging.warning(
+        "listAllowedFieldValues is deprecated and will be removed, use parse_ticket_field_cli instead"
+    )
+
+
+def list_allowed_field_values():
     """
     Get the allowed values for a ticket's custom fields.
 

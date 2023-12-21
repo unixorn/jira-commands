@@ -354,6 +354,27 @@ class JiraTool:
         human_names = self.customfield_id_map(ticket=ticket)
         return human_names[custom_field]
 
+    def get_issue_subtasks(self, ticket: str):
+        """
+        Return the list of subtask objects in the specified jira issue
+        """
+        issue = self.get_issue_data(ticket)
+        return issue.fields.subtasks
+
+    def list_issue_subtasks(self, ticket: str):
+        """
+        Return a list of all subtasks for the specified jira issue
+        """
+        subtasks = self.get_issue_subtasks(ticket)
+        logging.debug(f"subtasks: {subtasks}")
+        subtask_list = []
+        logging.debug(f"subtasks: {subtasks}")
+        for k in subtasks:
+            logging.debug(f"subtask: {k.key}")
+            subtask_list.append(k.key)
+        subtask_list.sort()
+        return subtask_list
+
     def updateField(self, ticket: str, custom_field: str, value, field_type: str):
         logging.warning(
             "JiraTool.updateField() is deprecated and will be removed soon, use JiraTool.update_field"

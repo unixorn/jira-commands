@@ -32,8 +32,8 @@ verbose_test:
 wheel: clean format requirements.txt ## Make a wheel file
 	poetry build
 
-local: wheel
-	docker buildx build --load -t unixorn/jira-commands --build-arg application_version=${MODULE_VERSION} .
+local: wheel requirements.txt
+	docker build --load -t ${USER}/jira-commands --build-arg application_version=${MODULE_VERSION} -f Dockerfile.testing --progress plain .
 
 multiimage: wheel ## Make a multi-architecture docker image
 	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands:${MODULE_VERSION} --build-arg application_version=${MODULE_VERSION} .
