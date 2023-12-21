@@ -33,8 +33,11 @@ All of these scripts support `--help` to get a detailed list of command line opt
 | Name                         | Description                                           |
 | -----------------------------| ----------------------------------------------------- |
 | `jc` | Main driver. Will run all the other commands inside a docker container for you. |
+| `jc assign subtasks` / `jc assign ticket subtasks` | Assign a ticket to someone. |
 | `jc assign ticket` / `jc ticket assign` | Assign a ticket to someone. |
+| `jc close subtasks` / `jc close ticket subtasks` | Close all of a ticket's subtasks |
 | `jc close ticket` / `jc ticket close` | Close a ticket |
+| `jc comment on subtasks` / `jc comment on ticket subtasks` | Add identical comment to all of a ticket's subtasks |
 | `jc comment on ticket` / `jc ticket comment` | Comment on a ticket |
 | `jc create ticket` / `jc ticket create` | Create a ticket. You will need|
 | `jc custom field allowed values` | List a custom field's allowed values since JIRA isn't forthcoming about them. |
@@ -44,9 +47,11 @@ All of these scripts support `--help` to get a detailed list of command line opt
 | `jc get priority ids` | Prints the names of all ticket priorities defined on your JIRA instance. |
 | `jc link tickets` / `jc ticket link` | Link two tickets. Use `jc get link types` to see what link names are defined on your JIRA server. Case matters. |
 | `jc list project tickets` | List open tickets in a given JIRA project |
+| `jc list subtasks` | Close all of a ticket's subtasks |
 | `jc list ticket transitions` / `jc ticket transition list` | See the availale transitions for a given ticket. |
 | `jc transition ticket to` / `jc ticket transition set` | Transition a ticket to another state. Use `jc list ticket transitions` to see which are available  |
 | `jc vivisect ticket` / `jc ticket vivisect` | Detailed dump of a ticket to find out all the custom field names and other innards. |
+| `jc transition subtasks` / `jc transition ticket subtasks`| Transition all of a ticket's subtasks to a specific state |
 
 The `jc` program is the main driver script and will find the subcommands, so you can do `jc ticket comment --ticket ABC-123 --comment 'foo bar baz'` and it will find the `jc-ticket-comment` script and run it with the `--ticket` and `--comment` arguments.
 

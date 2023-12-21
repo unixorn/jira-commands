@@ -23,17 +23,17 @@ isort = "^5.10.1"
 # There are multiple names for some of these for ease of use
 jc = 'jira_commands.cli.jc:jc_driver'
 
-jc-assign-ticket = 'jira_commands.cli.crudops:assignTicket'
-jc-ticket-assign = 'jira_commands.cli.crudops:assignTicket'
+jc-assign-ticket = 'jira_commands.cli.crudops:assign_ticket'
+jc-ticket-assign = 'jira_commands.cli.crudops:assign_ticket'
 
-jc-close-ticket = 'jira_commands.cli.crudops:closeTicket'
-jc-ticket-close = 'jira_commands.cli.crudops:closeTicket'
+jc-close-ticket = 'jira_commands.cli.crudops:close_ticket'
+jc-ticket-close = 'jira_commands.cli.crudops:close_ticket'
 
-jc-comment-on-ticket = 'jira_commands.cli.crudops:commentOnTicket'
-jc-ticket-comment = 'jira_commands.cli.crudops:commentOnTicket'
+jc-comment-on-ticket = 'jira_commands.cli.crudops:comment_on_ticket'
+jc-ticket-comment = 'jira_commands.cli.crudops:comment_on_ticket'
 
-jc-create-ticket = 'jira_commands.cli.crudops:createTicket'
-jc-ticket-create = 'jira_commands.cli.crudops:createTicket'
+jc-create-ticket = 'jira_commands.cli.crudops:create_ticket'
+jc-ticket-create = 'jira_commands.cli.crudops:create_ticket'
 
 jc-dump-all-customfield-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
 jc-dump-all-custom-field-allowed-values = 'jira_commands.cli.vivisect:dump_all_customfield_allowed_values'
@@ -50,25 +50,34 @@ jc-vivisect-ticket = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-examine = 'jira_commands.cli.vivisect:vivisect'
 jc-ticket-vivisect = 'jira_commands.cli.vivisect:vivisect'
 
-jc-custom-field-allowed-values = 'jira_commands.cli.vivisect:listAllowedFieldValues'
+jc-custom-field-allowed-values = 'jira_commands.cli.vivisect:list_allowed_field_values'
 
-jc-get-link-types = 'jira_commands.cli.crudops:getLinkTypes'
-jc-get-priorities = 'jira_commands.cli.crudops:getPriorities'
-jc-get-priority-ids = 'jira_commands.cli.crudops:getPriorities'
+jc-get-link-types = 'jira_commands.cli.crudops:get_link_types'
+jc-get-priorities = 'jira_commands.cli.crudops:get_priorities'
+jc-get-priority-ids = 'jira_commands.cli.crudops:get_priorities'
 
-jc-link-tickets = 'jira_commands.cli.crudops:linkTickets'
-jc-ticket-link = 'jira_commands.cli.crudops:linkTickets'
+jc-link-tickets = 'jira_commands.cli.crudops:link_tickets'
+jc-ticket-link = 'jira_commands.cli.crudops:link_tickets'
 
-jc-list-ticket-transitions = 'jira_commands.cli.crudops:getTransitions'
-jc-ticket-transition-list = 'jira_commands.cli.crudops:getTransitions'
-jc-ticket-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
+jc-list-ticket-transitions = 'jira_commands.cli.crudops:get_transitions'
+jc-ticket-transition-list = 'jira_commands.cli.crudops:get_transitions'
+
+jc-assign-subtasks = 'jira_commands.cli.subtasks:assign_subtasks'
+jc-assign-ticket-subtasks = 'jira_commands.cli.subtasks:assign_subtasks'
+jc-close-subtasks = 'jira_commands.cli.subtasks:close_subtasks'
+jc-close-ticket-subtasks = 'jira_commands.cli.subtasks:close_subtasks'
+jc-comment-on-subtasks = 'jira_commands.cli.subtasks:comment_on_subtasks'
+jc-comment-on-ticket-subtasks = 'jira_commands.cli.subtasks:comment_on_subtasks'
 jc-list-ticket-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
 jc-ticket-list-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
+jc-ticket-subtasks = 'jira_commands.cli.subtasks:list_subtasks'
+jc-transition-subtasks = 'jira_commands.cli.subtasks:transition_subtasks'
+jc-transition-ticket-subtasks = 'jira_commands.cli.subtasks:transition_subtasks'
 
 jc-list-project-tickets = 'jira_commands.cli.list:listTickets'
 
-jc-ticket-transition-set = 'jira_commands.cli.crudops:transitionTo'
-jc-transition-ticket-to = 'jira_commands.cli.crudops:transitionTo'
+jc-ticket-transition-set = 'jira_commands.cli.crudops:transition_to'
+jc-transition-ticket-to = 'jira_commands.cli.crudops:transition_to'
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/unixorn/jira-commands/issues"

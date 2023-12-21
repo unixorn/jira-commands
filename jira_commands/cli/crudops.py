@@ -16,8 +16,10 @@ from jira_commands.cli.common import (
 )
 from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
 
+# CLI parsers
 
-def parseTicketAssignCLI():
+
+def parse_ticket_assign_cli(description: str = "Assign a JIRA ticket to someone"):
     """
     Parses the command line options for assigning a ticket and
     initializes logging.
@@ -25,7 +27,7 @@ def parseTicketAssignCLI():
     Returns:
         An argparse CLI object
     """
-    parser = parse_ticket_cli(description="Assign a JIRA ticket to someone")
+    parser = parse_ticket_cli(description=description)
     parser.add_argument(
         "--assignee",
         type=str,
@@ -40,7 +42,7 @@ def parseTicketAssignCLI():
     return cli
 
 
-def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
+def parse_ticket_comment_cli(description: str = "Comment on a JIRA ticket"):
     """
     Parse command line options for commmenting on a ticket and initializes
     logging.
@@ -53,7 +55,7 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
         "--comment",
         type=str,
         required=True,
-        help="Comment to add to the specified ticket, It only supports very "
+        help="Comment to add to the specified ticket. It only supports very "
         "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
@@ -64,7 +66,7 @@ def parseTicketCommentCLI(description: str = "Comment on a JIRA ticket"):
     return cli
 
 
-def parseTicketCloseCLI(description="Close a JIRA ticket"):
+def parse_ticket_close_cli(description="Close a JIRA ticket"):
     """
     Parses command line options for closing a ticket and initializes logging.
 
@@ -75,7 +77,7 @@ def parseTicketCloseCLI(description="Close a JIRA ticket"):
     parser.add_argument(
         "--comment",
         type=str,
-        help="Comment to add to the specified ticket, It only supports very "
+        help="Comment to add to the specified ticket. It only supports very "
         "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
     )
     cli = parser.parse_args()
@@ -105,7 +107,7 @@ def parseTicketInspectionCLI(
     return cli
 
 
-def parseCreateTicketCLI(description: str = "Create a JIRA ticket"):
+def parse_create_ticket_cli(description: str = "Create a JIRA ticket"):
     """
     Parse the command line options
     """
@@ -127,7 +129,7 @@ def parseCreateTicketCLI(description: str = "Create a JIRA ticket"):
     return cli
 
 
-def parseGetTransitionsCLI(
+def parse_get_transitions_cli(
     description: str = "See all transitions available on a JIRA ticket",
 ):
     """
@@ -143,7 +145,7 @@ def parseGetTransitionsCLI(
     return cli
 
 
-def parseTicketLinkCLI(description: str = "Link two JIRA tickets"):
+def parse_ticket_link_cli(description: str = "Link two JIRA tickets"):
     """
     Command line options for linking two tickets
     """
@@ -176,7 +178,7 @@ def parseTicketLinkCLI(description: str = "Link two JIRA tickets"):
     return cli
 
 
-def parseTransitionToCLI(
+def parse_transition_to_cli(
     description: str = "See all transitions available on a JIRA ticket",
 ):
     """
@@ -184,7 +186,17 @@ def parseTransitionToCLI(
     """
     parser = parse_ticket_cli(description=description)
     parser.add_argument(
-        "--transition-to", help="Transition a ticket to a named state", type=str
+        "--comment",
+        type=str,
+        required=True,
+        help="Comment to add to the specified ticket. It only supports very "
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+    )
+    parser.add_argument(
+        "--transition-to",
+        help="Transition a ticket to a named state",
+        type=str,
+        default="Done",
     )
 
     cli = parser.parse_args()
@@ -195,11 +207,14 @@ def parseTransitionToCLI(
     return cli
 
 
-def assignTicket():
+# Entrypoints
+
+
+def assign_ticket():
     """
     Assign a ticket to someone
     """
-    cli = parseTicketAssignCLI()
+    cli = parse_ticket_assign_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -211,24 +226,11 @@ def assignTicket():
         jira.assign_ticket(ticket=cli.ticket, assignee=cli.assignee)
 
 
-def commentOnTicket():
-    """
-    Comment on a ticket
-    """
-    cli = parseTicketCommentCLI()
-    logging.debug(f"cli: {cli}")
-
-    settings = load_jira_settings(path=cli.settings_file, cli=cli)
-
-    jira = JiraTool(settings=settings)
-    jira.add_comment(ticket=cli.ticket, comment=cli.comment)
-
-
-def closeTicket():
+def close_ticket():
     """
     Close a ticket
     """
-    cli = parseTicketCommentCLI()
+    cli = parse_ticket_comment_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -237,11 +239,36 @@ def closeTicket():
     jira.transition_ticket(ticket=cli.ticket, state="Done", comment=cli.comment)
 
 
+def commentOnTicket():
+    logging.warning(
+        "commentOnTicket is deprecated and will be removed, use comment_on_ticket instead"
+    )
+
+
+def comment_on_ticket():
+    """
+    Comment on a ticket
+    """
+    cli = parse_ticket_comment_cli()
+    logging.debug(f"cli: {cli}")
+
+    settings = load_jira_settings(path=cli.settings_file, cli=cli)
+
+    jira = JiraTool(settings=settings)
+    jira.add_comment(ticket=cli.ticket, comment=cli.comment)
+
+
 def createTicket():
+    logging.warning(
+        "createTicket is deprecated and will be removed, use create_ticket instead"
+    )
+
+
+def create_ticket():
     """
     Create a JIRA ticket
     """
-    cli = parseCreateTicketCLI()
+    cli = parse_create_ticket_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -259,6 +286,12 @@ def createTicket():
 
 
 def getLinkTypes():
+    logging.warning(
+        "getLinkTypes is deprecated and will be removed, use get_link_types instead"
+    )
+
+
+def get_link_types():
     """
     Get all the link types on a server
     """
@@ -286,10 +319,16 @@ def getLinkTypes():
 
 
 def linkTickets():
+    logging.warning(
+        "linkTickets is deprecated and will be removed, use link_tickets instead"
+    )
+
+
+def link_tickets():
     """
     Link two tickets
     """
-    cli = parseTicketLinkCLI()
+    cli = parse_ticket_link_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -309,6 +348,12 @@ def linkTickets():
 
 
 def getPriorities():
+    logging.warning(
+        "getPriorities is deprecated and will be removed, use get_priorities instead"
+    )
+
+
+def get_priorities():
     """
     Get all the priorities on a server
     """
@@ -335,10 +380,16 @@ def getPriorities():
 
 
 def getTransitions():
+    logging.warning(
+        "getTransitions is deprecated and will be removed, use get_transitions instead"
+    )
+
+
+def get_transitions():
     """
     Print all the available transitions on a given ticket
     """
-    cli = parseGetTransitionsCLI()
+    cli = parse_get_transitions_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
@@ -348,10 +399,16 @@ def getTransitions():
 
 
 def transitionTo():
+    logging.warning(
+        "transitionTo is deprecated and will be removed, use transition_to instead"
+    )
+
+
+def transition_to():
     """
     Transition a given ticket to a specified state
     """
-    cli = parseTransitionToCLI()
+    cli = parse_transition_to_cli()
     logging.debug(f"cli: {cli}")
 
     settings = load_jira_settings(path=cli.settings_file, cli=cli)
