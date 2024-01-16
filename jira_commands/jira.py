@@ -277,7 +277,7 @@ class JiraTool:
 
     # Field manipulations
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def allowed_values_for_field(self, ticket: str, custom_field: str):
         """
         Get the allowed values for a custom field on an issue
@@ -304,7 +304,7 @@ class JiraTool:
             allowed[r["value"]] = r["id"]
         return allowed
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def customfield_id_map(self, ticket: str):
         """
         Create a dict keyed by customfield id with the the human names for
@@ -339,7 +339,7 @@ class JiraTool:
         logging.debug(f"name_map: {name_map}")
         return name_map
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def customfield_title(self, ticket: str, custom_field: str) -> str:
         """
         Return the human name of a custom field
@@ -887,7 +887,7 @@ class JiraTool:
 
     # debug tools
 
-    @lru_cache(maxsize=16)
+    @lru_cache(maxsize=128)
     def customfield_human_names(self, ticket: str):
         """
         Get the human names for a ticket's custom fields.
@@ -1019,7 +1019,7 @@ class JiraTool:
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
 
-    @lru_cache(maxsize=16)
+    @lru_cache(maxsize=128)
     def load_customfield_allowed_values(self, ticket: str):
         """
         Get the allowed values for all custom fields on a ticket
