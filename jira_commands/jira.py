@@ -1277,19 +1277,19 @@ class JiraTool:
             label = [label]
 
         if isinstance(label, list):
-            for l in label:
-                if isinstance(l, str):
+            for lbl in label:
+                if isinstance(lbl, str):
                     # if the label isn't present, we don't want to error
-                    if l in issue.fields.labels:
-                        issue.fields.labels.remove(l)
+                    if lbl in issue.fields.labels:
+                        issue.fields.labels.remove(lbl)
                     else:
                         logging.warning(
-                            f"Attempted to remove label {l} but it is not in {ticket}'s labels: {issue.fields.labels}"
+                            f"Attempted to remove label {lbl} but it is not in {ticket}'s labels: {issue.fields.labels}"
                         )
                 else:
                     logging.warning(f"label: {label}")
                     logging.warning(f"type: {type(label)}")
                     raise ValueError(
-                        f"Attempted to remove labels {label} from {ticket}, but {l} is not type str"
+                        f"Attempted to remove labels {label} from {ticket}, but {lbl} is not type str"
                     )
         return issue.update(fields={"labels": issue.fields.labels})
