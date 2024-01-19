@@ -33,6 +33,7 @@ All of these scripts support `--help` to get a detailed list of command line opt
 | Name                         | Description                                           |
 | -----------------------------| ----------------------------------------------------- |
 | `jc` | Main driver. Will run all the other commands inside a docker container for you. |
+| `jc add label` / `jc label add` | Add a label to a ticket |
 | `jc assign subtasks` / `jc assign ticket subtasks` | Assign a ticket to someone. |
 | `jc assign ticket` / `jc ticket assign` | Assign a ticket to someone. |
 | `jc close subtasks` / `jc close ticket subtasks` | Close all of a ticket's subtasks |
@@ -43,8 +44,10 @@ All of these scripts support `--help` to get a detailed list of command line opt
 | `jc custom field allowed values` | List a custom field's allowed values since JIRA isn't forthcoming about them. |
 | `jc examine ticket` / `jc ticket examine` | Detailed dump of a ticket and all its custom field names |
 | `jc extract customfield mappings` | Extract the custom field mappings from an issue into a file |
+| `jc get label` / `jc list labels` | List labels on a ticket |
 | `jc get link types` | Prints the names of all link types defined on your JIRA instance. |
 | `jc get priority ids` | Prints the names of all ticket priorities defined on your JIRA instance. |
+| `jc label remove` / `jc remove label` | Remove a label from a ticket |
 | `jc link tickets` / `jc ticket link` | Link two tickets. Use `jc get link types` to see what link names are defined on your JIRA server. Case matters. |
 | `jc list project tickets` | List open tickets in a given JIRA project |
 | `jc list subtasks` | Close all of a ticket's subtasks |
