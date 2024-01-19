@@ -277,7 +277,7 @@ class JiraTool:
 
     # Field manipulations
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def allowed_values_for_field(self, ticket: str, custom_field: str):
         """
         Get the allowed values for a custom field on an issue
@@ -304,7 +304,7 @@ class JiraTool:
             allowed[r["value"]] = r["id"]
         return allowed
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def customfield_id_map(self, ticket: str):
         """
         Create a dict keyed by customfield id with the the human names for
@@ -339,7 +339,7 @@ class JiraTool:
         logging.debug(f"name_map: {name_map}")
         return name_map
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=128)
     def customfield_title(self, ticket: str, custom_field: str) -> str:
         """
         Return the human name of a custom field
@@ -887,7 +887,7 @@ class JiraTool:
 
     # debug tools
 
-    @lru_cache(maxsize=16)
+    @lru_cache(maxsize=128)
     def customfield_human_names(self, ticket: str):
         """
         Get the human names for a ticket's custom fields.
@@ -1019,7 +1019,7 @@ class JiraTool:
         logging.debug(f"Transition lookup table: {transitions}")
         return transitions
 
-    @lru_cache(maxsize=16)
+    @lru_cache(maxsize=128)
     def load_customfield_allowed_values(self, ticket: str):
         """
         Get the allowed values for all custom fields on a ticket
@@ -1224,3 +1224,72 @@ class JiraTool:
 
         logging.debug("Set data[%s] to %s", custom_field, fields[custom_field])
         return fields
+
+    def add_issue_label(self, ticket: str = None, labels=None):
+        """
+        Add a label or labels to a ticket.
+
+        Args:
+            ticket: what ticket to add the label(s) to
+            labels: either a str or a list of str
+        """
+
+        if not (isinstance(labels, list) or isinstance(labels, str)):
+            raise ValueError("labels must be a str or a list of strings")
+        issue = self.get_ticket(ticket=ticket)
+        if isinstance(labels, str):
+            labels = [labels]
+        if isinstance(labels, list):
+            logging.debug(f"labels = {labels}")
+            for lbl in labels:
+                if isinstance(lbl, str):
+                    # JIRA is slow, so eliminate unnecessary calls to the API
+                    if lbl not in issue.fields.labels:
+                        issue.fields.labels.append(lbl)
+                else:
+                    raise ValueError(
+                        f"Attempted to add labels {labels} from {ticket}, but {lbl} is not type str"
+                    )
+        return issue.update(fields={"labels": issue.fields.labels})
+
+    def get_issue_labels(self, ticket: str = None):
+        """
+        Get labels for an issue
+
+        Args:
+            ticket: str of ticket to get labels for
+        """
+        issue = self.get_ticket(ticket=ticket)
+        return issue.fields.labels
+
+    def remove_issue_label(self, ticket: str = None, label=None):
+        """
+        Remove a label or list of labels from an issue
+
+        Args:
+            ticket: what ticket to remove the label(s) from
+            labels: either a str or a list of str
+        """
+        if not (isinstance(label, list) or isinstance(label, str)):
+            raise ValueError("label must be a str or a list of strings")
+        issue = self.get_ticket(ticket=ticket)
+        if isinstance(label, str):
+            label = [label]
+
+        if isinstance(label, list):
+            for lbl in label:
+                if isinstance(lbl, str):
+                    # if the label isn't present, we don't want to error
+                    if lbl in issue.fields.labels:
+                        issue.fields.labels.remove(lbl)
+                    else:
+                        logging.warning(
+                            f"Attempted to remove label {lbl} but it is not in {ticket}'s labels: {issue.fields.labels}"
+                        )
+                else:
+                    logging.warning(f"label: {label}")
+                    logging.warning(f"type: {type(label)}")
+                    raise ValueError(
+                        f"Attempted to remove labels {label} from {ticket}, but {lbl} is not type str"
+                    )
+        return issue.update(fields={"labels": issue.fields.labels})

@@ -13,7 +13,7 @@ import sys
 from thelogrus.cli import find_subcommand
 
 
-def jcUsage():
+def jc_usage():
     """
     They called jc with no subcommands, or we couldn't find a subcommand
     """
@@ -47,7 +47,7 @@ def jc_driver():
             sys.exit(13)
     except RuntimeError as e:
         print(str(e))
-        jcUsage()
+        jc_usage()
         sys.exit(13)
     subprocess.check_call([command] + args)
 

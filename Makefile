@@ -13,13 +13,10 @@ image: local ## Make a docker image that only supports the architecture we're ru
 
 MODULE_VERSION=$(shell poetry run python3 -c 'from jira_commands import __version__;print(__version__)' )
 
-format: format_code format_tests ## Reformat our .py files with black
+format: format_code ## Reformat our .py files with black
 
 format_code:
 	black .
-
-format_tests:
-	black tests/*.py
 
 tests: test ## Run nose tests
 test:
@@ -39,7 +36,7 @@ multiimage: wheel ## Make a multi-architecture docker image
 	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands:${MODULE_VERSION} --build-arg application_version=${MODULE_VERSION} .
 	make local
 
-clean: ## Clean up our checkout
+clean: format ## Clean up our checkout
 	rm -fv dist/*
 	hooks/scripts/clean-up-pyc-and-pyo-files
 
