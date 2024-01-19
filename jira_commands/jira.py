@@ -1233,33 +1233,36 @@ class JiraTool:
             ticket: what ticket to add the label(s) to
             labels: either a str or a list of str
         """
-        if not ((type(labels) is list) or (type(labels) is str)):
+
+        if not (isinstance(labels, list) or isinstance(labels, str)):
             raise ValueError("labels must be a str or a list of strings")
         issue = self.get_ticket(ticket=ticket)
-        if type(labels) == str:
+        if isinstance(labels, str):
             logging.info(f"Convert {labels} to list")
             labels = [labels]
-        if type(labels) == list:
+        if isinstance(labels, list):
             logging.info(f"labels = {labels}")
-            for l in labels:
-                if type(l) is str:
+            for lbl in labels:
+                if isinstance(lbl, str):
                     # JIRA is slow, so eliminate unnecessary calls to the API
-                    if l not in issue.fields.labels:
-                        issue.fields.labels.append(l)
+                    if lbl not in issue.fields.labels:
+                        issue.fields.labels.append(lbl)
                 else:
                     raise ValueError(
-                        f"Attempted to add labels {labels} from {ticket}, but {l} is not type str"
+                        f"Attempted to add labels {labels} from {ticket}, but {lbl} is not type str"
                     )
         return issue.update(fields={"labels": issue.fields.labels})
 
-    def get_issue_labels(self,ticket:str=None):
-        '''
+    def get_issue_labels(self, ticket: str = None):
+        """
         Get labels for an issue
+
         Args:
             ticket: str of ticket to get labels for
-        '''
+        """
         issue = self.get_ticket(ticket=ticket)
         return issue.fields.labels
+
     def remove_issue_label(self, ticket: str = None, label=None):
         """
         Remove a label or list of labels from an issue
@@ -1268,19 +1271,25 @@ class JiraTool:
             ticket: what ticket to remove the label(s) from
             labels: either a str or a list of str
         """
-        if not ((type(label) is list) or (type(label) is str)):
+        if not (isinstance(label, list) or isinstance(label, str)):
             raise ValueError("label must be a str or a list of strings")
         issue = self.get_ticket(ticket=ticket)
-        if type(label) == str:
+        if isinstance(label, str):
             label = [label]
 
-        if type(label) == list:
+        if isinstance(label, list):
             for l in label:
-                if type(l) is str:
+                if isinstance(l, str):
                     # if the label isn't present, we don't want to error
                     if l in issue.fields.labels:
                         issue.fields.labels.remove(l)
+                    else:
+                        logging.warning(
+                            f"Attempted to remove label {l} but it is not in {ticket}'s labels: {issue.fields.labels}"
+                        )
                 else:
+                    logging.warning(f"label: {label}")
+                    logging.warning(f"type: {type(label)}")
                     raise ValueError(
                         f"Attempted to remove labels {label} from {ticket}, but {l} is not type str"
                     )
