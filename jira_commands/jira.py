@@ -1238,10 +1238,9 @@ class JiraTool:
             raise ValueError("labels must be a str or a list of strings")
         issue = self.get_ticket(ticket=ticket)
         if isinstance(labels, str):
-            logging.info(f"Convert {labels} to list")
             labels = [labels]
         if isinstance(labels, list):
-            logging.info(f"labels = {labels}")
+            logging.debug(f"labels = {labels}")
             for lbl in labels:
                 if isinstance(lbl, str):
                     # JIRA is slow, so eliminate unnecessary calls to the API
