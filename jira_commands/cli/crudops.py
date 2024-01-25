@@ -7,14 +7,24 @@
 
 import json
 import logging
+import os
 import sys
 
+from jira_commands import __version__ as cli_version
 from jira_commands.cli.common import (
     base_cli_parser,
     parse_ticket_cli,
     ticket_creation_parser,
 )
 from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
+
+
+def default_comment() -> str:
+    username = os.environ.get("USER", "docker container")
+    comment = "Updated with jc v" + cli_version + " by " + username
+    logging.debug(f"Default comment: {comment}")
+    return comment
+
 
 # CLI parsers
 
@@ -44,7 +54,7 @@ def parse_ticket_assign_cli(description: str = "Assign a JIRA ticket to someone"
 
 def parse_ticket_comment_cli(description: str = "Comment on a JIRA ticket"):
     """
-    Parse command line options for commmenting on a ticket and initializes
+    Parse command line options for commenting on a ticket and initializes
     logging.
 
     Returns:
@@ -54,9 +64,10 @@ def parse_ticket_comment_cli(description: str = "Comment on a JIRA ticket"):
     parser.add_argument(
         "--comment",
         type=str,
-        required=True,
+        default=default_comment(),
         help="Comment to add to the specified ticket. It only supports very "
-        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't."
+        " Default: " + default_comment(),
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -77,8 +88,10 @@ def parse_ticket_close_cli(description="Close a JIRA ticket"):
     parser.add_argument(
         "--comment",
         type=str,
+        default=default_comment(),
         help="Comment to add to the specified ticket. It only supports very "
-        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't."
+        " Defaults: " + default_comment(),
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -188,9 +201,10 @@ def parse_transition_to_cli(
     parser.add_argument(
         "--comment",
         type=str,
-        required=True,
+        default=default_comment(),
         help="Comment to add to the specified ticket. It only supports very "
-        "limited formatting - _italic_ and *bold* work, but `code` doesn't.",
+        "limited formatting - _italic_ and *bold* work, but `code` doesn't."
+        " Default: " + default_comment(),
     )
     parser.add_argument(
         "--transition-to",
