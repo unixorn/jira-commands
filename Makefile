@@ -11,8 +11,6 @@ t: test
 i: image
 image: local ## Make a docker image that only supports the architecture we're running on for quick testing
 
-MODULE_VERSION=$(shell poetry run python3 -c 'from jira_commands import __version__;print(__version__)' )
-
 format: format_code ## Reformat our .py files with black
 
 format_code:
@@ -30,7 +28,7 @@ wheel: clean format requirements.txt ## Make a wheel file
 	poetry build
 
 local: wheel requirements.txt
-	docker build --load -t ${USER}/jira-commands --build-arg application_version=${MODULE_VERSION} -f Dockerfile.testing --progress plain .
+	docker build --load -t ${USER}/jira-commands --build-arg -f Dockerfile.testing --progress plain .
 
 multiimage: wheel ## Make a multi-architecture docker image
 	docker buildx build --platform linux/arm64,linux/amd64 --push -t unixorn/jira-commands:${MODULE_VERSION} --build-arg application_version=${MODULE_VERSION} .
