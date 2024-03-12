@@ -107,7 +107,9 @@ def load_jira_settings(path: str, cli):
             if cli.pat_token:
                 settings["pat_token"] = cli.pat_token
             else:
-                logging.warning("cli pat token is None, skipping assignment")
+                logging.debug("cli pat token is None")
+                if "pat_token" in settings:
+                    logging.debug("Found pat token in settings...")
         if "pat_token" not in settings:
             settings["pat_token"] = input("pat_token: ")
 

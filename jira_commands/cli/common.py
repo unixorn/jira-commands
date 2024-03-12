@@ -162,6 +162,13 @@ def ticket_creation_parser(description: str = None):
     return parser
 
 
+def stdin_to_string() -> str:
+    stdin_comment = ""
+    for comment_line in sys.stdin:
+        stdin_comment = stdin_comment + comment_line
+    return stdin_comment
+
+
 if __name__ == "__main__":
     print("Don't run this directly, import functions from it")
     sys.exit(13)

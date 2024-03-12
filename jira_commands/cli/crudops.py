@@ -14,6 +14,7 @@ from jira_commands import __version__ as cli_version
 from jira_commands.cli.common import (
     base_cli_parser,
     parse_ticket_cli,
+    stdin_to_string,
     ticket_creation_parser,
 )
 from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
@@ -68,6 +69,12 @@ def parse_ticket_comment_cli(description: str = "Comment on a JIRA ticket"):
         help="Comment to add to the specified ticket. It only supports very "
         "limited formatting - _italic_ and *bold* work, but `code` doesn't."
         " Default: " + default_comment(),
+    )
+    parser.add_argument(
+        "--stdin-comment",
+        "--stdin",
+        help="Read a comment from STDIN",
+        action="store_true",
     )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
@@ -257,6 +264,7 @@ def commentOnTicket():
     logging.warning(
         "commentOnTicket is deprecated and will be removed, use comment_on_ticket instead"
     )
+    comment_on_ticket()
 
 
 def comment_on_ticket():
@@ -270,6 +278,10 @@ def comment_on_ticket():
 
     jira = JiraTool(settings=settings)
     jira.add_comment(ticket=cli.ticket, comment=cli.comment)
+    if cli.stdin_comment:
+        stdin_comment = stdin_to_string()
+        if stdin_comment:
+            jira.add_comment(ticket=cli.ticket, comment=stdin_comment)
 
 
 def createTicket():
