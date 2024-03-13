@@ -4,6 +4,7 @@
 # Copyright 2022, ZScaler Inc.
 
 import argparse
+import logging
 import os
 import sys
 
@@ -166,6 +167,7 @@ def stdin_to_string() -> str:
     stdin_comment = ""
     for comment_line in sys.stdin:
         stdin_comment = stdin_comment + comment_line
+    logging.debug(f"stdin_comment: {stdin_comment}")
     return stdin_comment
 
 
