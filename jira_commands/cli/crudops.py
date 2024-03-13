@@ -108,7 +108,14 @@ def parse_ticket_close_cli(description="Close a JIRA ticket"):
     return cli
 
 
-def parseTicketInspectionCLI(
+def parseTicketInspectionCLI():
+    logging.warning(
+        "parseTicketInspectionCLI() is deprecated and will be removed. Use parse_ticket_inspection_cli() instead"
+    )
+    parse_ticket_inspection_cli()
+
+
+def parse_ticket_inspection_cli(
     description: str = "Vivisect a JIRA ticket so we can determine which "
     "custom fields map to which data keys",
 ):
@@ -219,7 +226,6 @@ def parse_transition_to_cli(
         type=str,
         default="Done",
     )
-
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -288,6 +294,7 @@ def createTicket():
     logging.warning(
         "createTicket is deprecated and will be removed, use create_ticket instead"
     )
+    create_ticket()
 
 
 def create_ticket():
@@ -315,6 +322,7 @@ def getLinkTypes():
     logging.warning(
         "getLinkTypes is deprecated and will be removed, use get_link_types instead"
     )
+    get_link_types()
 
 
 def get_link_types():
