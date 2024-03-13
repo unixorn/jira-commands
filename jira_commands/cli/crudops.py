@@ -14,6 +14,7 @@ from jira_commands import __version__ as cli_version
 from jira_commands.cli.common import (
     base_cli_parser,
     parse_ticket_cli,
+    stdin_to_string,
     ticket_creation_parser,
 )
 from jira_commands.jira import JiraTool, load_jira_settings, make_issue_data
@@ -69,6 +70,12 @@ def parse_ticket_comment_cli(description: str = "Comment on a JIRA ticket"):
         "limited formatting - _italic_ and *bold* work, but `code` doesn't."
         " Default: " + default_comment(),
     )
+    parser.add_argument(
+        "--stdin-comment",
+        "--stdin",
+        help="Read a comment from STDIN",
+        action="store_true",
+    )
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -101,7 +108,14 @@ def parse_ticket_close_cli(description="Close a JIRA ticket"):
     return cli
 
 
-def parseTicketInspectionCLI(
+def parseTicketInspectionCLI():
+    logging.warning(
+        "parseTicketInspectionCLI() is deprecated and will be removed. Use parse_ticket_inspection_cli() instead"
+    )
+    parse_ticket_inspection_cli()
+
+
+def parse_ticket_inspection_cli(
     description: str = "Vivisect a JIRA ticket so we can determine which "
     "custom fields map to which data keys",
 ):
@@ -212,7 +226,6 @@ def parse_transition_to_cli(
         type=str,
         default="Done",
     )
-
     cli = parser.parse_args()
     loglevel = getattr(logging, cli.log_level.upper(), None)
     logFormat = "[%(asctime)s][%(levelname)8s][%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -257,6 +270,7 @@ def commentOnTicket():
     logging.warning(
         "commentOnTicket is deprecated and will be removed, use comment_on_ticket instead"
     )
+    comment_on_ticket()
 
 
 def comment_on_ticket():
@@ -270,12 +284,17 @@ def comment_on_ticket():
 
     jira = JiraTool(settings=settings)
     jira.add_comment(ticket=cli.ticket, comment=cli.comment)
+    if cli.stdin_comment:
+        stdin_comment = stdin_to_string()
+        if stdin_comment:
+            jira.add_comment(ticket=cli.ticket, comment=stdin_comment)
 
 
 def createTicket():
     logging.warning(
         "createTicket is deprecated and will be removed, use create_ticket instead"
     )
+    create_ticket()
 
 
 def create_ticket():
@@ -303,6 +322,7 @@ def getLinkTypes():
     logging.warning(
         "getLinkTypes is deprecated and will be removed, use get_link_types instead"
     )
+    get_link_types()
 
 
 def get_link_types():
