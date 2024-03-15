@@ -56,6 +56,9 @@ jc-get-link-types = 'jira_commands.cli.crudops:get_link_types'
 jc-get-priorities = 'jira_commands.cli.crudops:get_priorities'
 jc-get-priority-ids = 'jira_commands.cli.crudops:get_priorities'
 
+jc-jql-query = 'jira_commands.cli.jql:run_jql'
+jc-run-jql-query = 'jira_commands.cli.jql:run_jql'
+
 jc-link-tickets = 'jira_commands.cli.crudops:link_tickets'
 jc-ticket-link = 'jira_commands.cli.crudops:link_tickets'
 

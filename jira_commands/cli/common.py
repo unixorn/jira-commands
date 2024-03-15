@@ -113,7 +113,9 @@ def parse_ticket_cli(description: str = None):
     """
     parser = base_cli_parser(description=description)
 
-    parser.add_argument("--ticket", "-t", type=str, required=True)
+    parser.add_argument(
+        "--ticket", "-t", type=str, required=True, help="Which JIRA ticket to act on"
+    )
     return parser
 
 
