@@ -79,8 +79,12 @@ def comment_on_subtasks():
 
     jira = JiraTool(settings=settings)
     subtasks_l = jira.list_issue_subtasks(ticket=cli.ticket)
+    if cli.stdin_comment:
+        stdin_comment = stdin_to_string()
     for subtask in subtasks_l:
         jira.add_comment(ticket=subtask, comment=cli.comment)
+        if stdin_comment:
+            jira.add_comment(ticket=cli.ticket, comment=stdin_comment)
 
 
 def list_subtasks():
