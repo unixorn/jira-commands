@@ -7,7 +7,7 @@
 
 import logging
 
-from jira_commands.cli.common import parse_ticket_cli
+from jira_commands.cli.common import parse_ticket_cli, stdin_to_string
 from jira_commands.jira import JiraTool, load_jira_settings
 from jira_commands.cli.crudops import (
     parse_ticket_assign_cli,
