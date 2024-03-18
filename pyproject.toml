@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira-commands"
-version = "0.21.0"
+version = "0.22.0"
 description = "Command line utilities for interacting with JIRA"
 authors = ["Joe Block <jpb@unixorn.net>"]
 homepage = "https://github.com/unixorn/jira-commands"
@@ -55,6 +55,9 @@ jc-custom-field-allowed-values = 'jira_commands.cli.vivisect:list_allowed_field_
 jc-get-link-types = 'jira_commands.cli.crudops:get_link_types'
 jc-get-priorities = 'jira_commands.cli.crudops:get_priorities'
 jc-get-priority-ids = 'jira_commands.cli.crudops:get_priorities'
+
+jc-jql-query = 'jira_commands.cli.jql:run_jql'
+jc-run-jql-query = 'jira_commands.cli.jql:run_jql'
 
 jc-link-tickets = 'jira_commands.cli.crudops:link_tickets'
 jc-ticket-link = 'jira_commands.cli.crudops:link_tickets'

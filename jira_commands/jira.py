@@ -1295,3 +1295,15 @@ class JiraTool:
                         f"Attempted to remove labels {label} from {ticket}, but {lbl} is not type str"
                     )
         return issue.update(fields={"labels": issue.fields.labels})
+
+    def jql(self, jql: str = None):
+        """
+        Return issues matching a JQL query
+
+        Args:
+            jql: A string containing a JQL query
+        """
+        logging.debug(f"JQL: {jql}")
+        results = self.connection.search_issues(jql)
+        logging.debug(f"QUERY RESULTS: {results}")
+        return results

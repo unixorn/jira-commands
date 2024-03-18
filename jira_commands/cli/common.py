@@ -39,7 +39,7 @@ def base_cli_parser(description: str = None):
         type=str.upper,
         help="Set authentication method to use.",
         choices=["BASIC", "OAUTH", "PAT"],
-        default="BASIC",
+        default="PAT",
     )
     parser.add_argument(
         "--oauth-access-token",
@@ -79,6 +79,8 @@ def base_cli_parser(description: str = None):
     settingsFileCandidates = [settingsFileDefault, "/etc/zscaler/jira/jira.yaml"]
     if "HOME" in os.environ:
         settingsFileCandidates.append(f"{os.environ.get('HOME')}/.zscaler/jira.yaml")
+    if "JIRA_CREDENTIALS_FILE" in os.environ:
+        settingsFileCandidates.append(os.environ.get("JIRA_CREDENTIALS_FILE"))
     for candidate in settingsFileCandidates:
         if readableFile(candidate):
             settingsFileDefault = candidate
@@ -111,7 +113,9 @@ def parse_ticket_cli(description: str = None):
     """
     parser = base_cli_parser(description=description)
 
-    parser.add_argument("--ticket", "-t", type=str, required=True)
+    parser.add_argument(
+        "--ticket", "-t", type=str, required=True, help="Which JIRA ticket to act on"
+    )
     return parser
 
 
