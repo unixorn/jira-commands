@@ -8,19 +8,19 @@ repos:
         language: script
         entry: ./hooks/scripts/clean-up-pyc-and-pyo-files
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: 'v0.0.254'
+    rev: 'v0.6.1'
     hooks:
       - id: ruff
 
   - repo: https://github.com/psf/black
-    rev: "23.1.0"
+    rev: "24.8.0"
     hooks:
       - id: black
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
       - id: check-docstring-first
