@@ -38,7 +38,7 @@ def jc_driver():
     Subcommands are responsible for their own argument parsing.
     """
     try:
-        (command, args) = find_subcommand(sys.argv)
+        command, args = find_subcommand(sys.argv)
 
         # If we can't construct a subcommand from sys.argv, it'll still be able
         # to find this driver script, and re-running ourself isn't useful.
