@@ -97,7 +97,7 @@ def base_cli_parser(description: str = None):
     parser.add_argument(
         "--password",
         type=str,
-        help="What username to use with JIRA. This overrides any setting in the settings file.",
+        help="What password to use with JIRA. This overrides any setting in the settings file.",
     )
 
     return parser
